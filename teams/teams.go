@@ -23,6 +23,13 @@ const (
 	QGetTeams = `
 select id, name, members, score, token
 from teams;`
+
+	QCreateTeam = `
+insert into teams (
+	name, members, score, token
+) values (
+	?, ?, 0, ''
+);`
 )
 
 // InitTables initializes the database tables.
@@ -59,6 +66,12 @@ type Team struct {
 	Members     string
 	Score       int
 	SubmitToken string
+}
+
+// Save creates a new Team in the database.
+func (t *Team) Save(db *sql.DB) error {
+	_, err := db.Exec(QCreateTeam, t.Name, t.Members)
+	return err
 }
 
 // Submitted contains information about a flag submitted by a team.

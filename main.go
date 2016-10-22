@@ -25,6 +25,7 @@ func main() {
 	}
 
 	http.HandleFunc("/", endpoints.Index(db, &cfg))
+	http.HandleFunc("/register", endpoints.Register(db, &cfg))
 	fmt.Println("Listening on", cfg.BindAddress)
 	http.ListenAndServe(cfg.BindAddress, nil)
 }
