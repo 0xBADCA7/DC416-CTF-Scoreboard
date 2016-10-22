@@ -1,8 +1,11 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"net/http"
+
+	_ "github.com/mattn/go-sqlite3"
 
 	"./config"
 	"./endpoints"
@@ -11,7 +14,12 @@ import (
 func main() {
 	cfg := config.Default()
 
-	http.HandleFunc("/", endpoints.Index(nil, &cfg))
+	db, err := sql.Open("sqlite3", cfg.DatabaseFile)
+	if err != nil {
+		panic(err)
+	}
+
+	http.HandleFunc("/", endpoints.Index(db, &cfg))
 	fmt.Println("Listening on", cfg.BindAddress)
 	http.ListenAndServe(cfg.BindAddress, nil)
 }

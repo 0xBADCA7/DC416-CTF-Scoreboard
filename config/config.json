@@ -1,5 +1,6 @@
 {
   "bindAddress": "0.0.0.0:3000",
+  "dbFile": "scoreboard.db",
   "htmlDir": "html",
   "cssDir": "css",
   "jsDir": "js",
