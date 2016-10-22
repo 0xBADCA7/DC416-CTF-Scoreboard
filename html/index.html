@@ -4,5 +4,20 @@
   </head>
   <body>
     {{.Message}}
+    <h1>Team Scores</h1>
+    <table>
+      <tr>
+        <th>Team Name</th>
+        <th>Score</th>
+        <th>Members</th>
+      </tr>
+      {{range .Teams}}
+      <tr>
+        <td>{{.Name}}</td>
+        <td>{{.Score}}</td>
+        <td>{{.Members}}</td>
+      </tr>
+      {{end}}
+    </table>
   </body>
 </html>

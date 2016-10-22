@@ -9,12 +9,17 @@ import (
 
 	"./config"
 	"./endpoints"
+	"./teams"
 )
 
 func main() {
 	cfg := config.Default()
 
 	db, err := sql.Open("sqlite3", cfg.DatabaseFile)
+	if err != nil {
+		panic(err)
+	}
+	err = teams.InitTables(db)
 	if err != nil {
 		panic(err)
 	}
