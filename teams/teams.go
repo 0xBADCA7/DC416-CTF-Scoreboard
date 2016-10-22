@@ -2,6 +2,7 @@ package teams
 
 import (
 	"database/sql"
+	"fmt"
 )
 
 const (
@@ -10,7 +11,7 @@ const (
 		name text,
 		members text,
 		score integer,
-		token text
+		token text unique
 );`
 
 	QInitSubmitted = `create table if not exists submitted (
@@ -24,12 +25,23 @@ const (
 select id, name, members, score, token
 from teams;`
 
+	// TODO - Create a submission token for inclusion upon team creation
 	QCreateTeam = `
 insert into teams (
 	name, members, score, token
 ) values (
 	?, ?, 0, ''
 );`
+
+	QFindTeamBySubmissionToken = `
+select id, name, members, score
+from teams
+where token = ?;`
+
+	QUpdateTeam = `
+update teams
+set score = ?, token = ?
+where id = ?;`
 )
 
 // InitTables initializes the database tables.
@@ -59,6 +71,19 @@ func FindTeams(db *sql.DB) ([]Team, error) {
 	return teams, err
 }
 
+// FindTeamByToken attempts to do a lookup for a team using its unique submission token.
+func FindTeamByToken(db *sql.DB, token string) (Team, error) {
+	team := Team{}
+	fmt.Println("looking for team with token", token)
+	err := db.QueryRow(QFindTeamBySubmissionToken, token).Scan(
+		&team.Id, &team.Name, &team.Members, &team.Score)
+	if err != nil {
+		return Team{}, err
+	}
+	team.SubmitToken = token
+	return team, err
+}
+
 // Team contains information about teams that should never be served to users.
 type Team struct {
 	Id          int
@@ -71,6 +96,12 @@ type Team struct {
 // Save creates a new Team in the database.
 func (t *Team) Save(db *sql.DB) error {
 	_, err := db.Exec(QCreateTeam, t.Name, t.Members)
+	return err
+}
+
+// Update resets the team's score and allows for changing their submission token.
+func (t *Team) Update(db *sql.DB) error {
+	_, err := db.Exec(QUpdateTeam, t.Score, t.SubmitToken, t.Id)
 	return err
 }
 

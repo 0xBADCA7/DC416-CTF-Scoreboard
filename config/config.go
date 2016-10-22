@@ -4,6 +4,7 @@ package config
 type Flag struct {
 	Id     int    `json:"id"`
 	Secret string `json:"secret"`
+	Reward int    `json:"reward"`
 }
 
 // Config contains all of the configuration information required by the application.
@@ -26,8 +27,8 @@ func Default() Config {
 		"js",
 		"img",
 		[]Flag{
-			{1, "secret1"},
-			{2, "secret2"},
+			{1, "secret1", 10},
+			{2, "secret2", 20},
 		},
 	}
 }
