@@ -47,6 +47,21 @@ func Submit(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 		}
 		for _, flag := range cfg.Flags {
 			if flag.Secret == flags[0] {
+				submission, err := teams.FindSubmission(db, team.Id, flag.Id)
+				if err == nil {
+					w.WriteHeader(http.StatusBadRequest)
+					w.Write([]byte("You cannot submit the same flag multiple times."))
+					break
+				}
+				submission.Flag = flag.Id
+				submission.Owner = team.Id
+				err = submission.Save(db)
+				if err != nil {
+					fmt.Println(err)
+					w.WriteHeader(http.StatusInternalServerError)
+					w.Write([]byte("Could not record your submission. Please notify the CTF administrators."))
+					break
+				}
 				team.Score += flag.Reward
 				err = team.Update(db)
 				if err != nil {

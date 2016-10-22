@@ -42,6 +42,18 @@ where token = ?;`
 update teams
 set score = ?, token = ?
 where id = ?;`
+
+	QFindSubmission = `
+select id
+from submitted
+where team_id = ? and flag_id = ?;`
+
+	QSaveSubmission = `
+insert into submitted (
+	team_id, flag_id
+) values (
+	?, ?
+);`
 )
 
 // InitTables initializes the database tables.
@@ -105,12 +117,31 @@ func (t *Team) Update(db *sql.DB) error {
 	return err
 }
 
-// Submitted contains information about a flag submitted by a team.
+// FindSubmission attempts to find an entry in the submission table for the flag that the user is submitting
+// for their team.
+func FindSubmission(db *sql.DB, teamId int, flagId int) (Submission, error) {
+	s := Submission{}
+	err := db.QueryRow(QFindSubmission, teamId, flagId).Scan(&s.Id)
+	if err != nil {
+		return Submission{}, err
+	}
+	s.Flag = flagId
+	s.Owner = teamId
+	return s, nil
+}
+
+// Submission contains information about a flag submitted by a team.
 // The flag ID is an integer that is specified in the application config and is unique.
-type Submitted struct {
+type Submission struct {
 	Id    int
 	Flag  int
-	Owner Team
+	Owner int
+}
+
+// Save creates a new record of a team submitting a flag.
+func (s *Submission) Save(db *sql.DB) error {
+	_, err := db.Exec(QSaveSubmission, s.Owner, s.Flag)
+	return err
 }
 
 // TeamScore contains information about a team's score.
