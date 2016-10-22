@@ -1,0 +1,7 @@
+{
+  "bindAddress": "0.0.0.0:3000",
+  "htmlDir": "html",
+  "cssDir": "css",
+  "jsDir": "js",
+  "imgDir": "img"
+}
