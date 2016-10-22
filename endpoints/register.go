@@ -15,7 +15,6 @@ import (
 // Register presents a page which users can use to register.
 func Register(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		fmt.Println(r)
 		if strings.ToUpper(r.Method) == "POST" {
 			registerNewTeam(db, cfg, w, r)
 		} else {

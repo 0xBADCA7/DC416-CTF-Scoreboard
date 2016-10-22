@@ -52,7 +52,7 @@ func FindTeams(db *sql.DB) ([]Team, error) {
 	for rows.Next() {
 		team := Team{}
 		err = rows.Scan(&team.Id, &team.Name, &team.Members, &team.Score, &team.SubmitToken)
-		if err != nil {
+		if err == nil {
 			teams = append(teams, team)
 		}
 	}

@@ -38,6 +38,7 @@ func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 			"Hello DC416!",
 			[]teams.TeamScore{},
 		}
+		fmt.Println("Got teams", teamInfo)
 		for _, team := range teamInfo {
 			data.Teams = append(data.Teams, teams.TeamScore{team.Name, team.Members, team.Score})
 		}
