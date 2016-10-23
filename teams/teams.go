@@ -33,7 +33,7 @@ from teams;`
 insert into teams (
 	name, members, score, token, last_valid_submission
 ) values (
-	?, ?, 0, ?, datetime(0, 'unixepoch', 'localtime');
+	?, ?, 0, ?, datetime(0, 'unixepoch', 'localtime')
 );`
 
 	QFindTeamBySubmissionToken = `
@@ -98,7 +98,10 @@ func FindTeams(db *sql.DB) ([]Team, error) {
 		team := Team{}
 		err = rows.Scan(&team.Id, &team.Name, &team.Members, &team.Score, &team.SubmitToken, &team.LastSubmission)
 		if err == nil {
+			fmt.Println("Got team", team)
 			teams = append(teams, team)
+		} else {
+			fmt.Println(err)
 		}
 	}
 	return teams, err
@@ -151,6 +154,7 @@ func (t *Team) Save(db *sql.DB) error {
 	uniqueToken := generateUniqueToken(db)
 	t.SubmitToken = uniqueToken
 	_, err := db.Exec(QCreateTeam, t.Name, t.Members, t.SubmitToken)
+	fmt.Println("---", err)
 	return err
 }
 
