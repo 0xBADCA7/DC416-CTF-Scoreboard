@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"fmt"
 	"net/http"
+	"os"
 
 	_ "github.com/mattn/go-sqlite3"
 
@@ -13,7 +14,12 @@ import (
 )
 
 func main() {
-	cfg := config.MustLoad("./config/config.json")
+	cfgFile := os.Getenv("CONFIG_FILE")
+	if cfgFile == "" {
+		cfgFile = "./config/config.json"
+	}
+	fmt.Println(cfgFile)
+	cfg := config.MustLoad(cfgFile)
 
 	db, err := sql.Open("sqlite3", cfg.DatabaseFile)
 	if err != nil {
