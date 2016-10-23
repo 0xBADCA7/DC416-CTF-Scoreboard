@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"path"
+	"sort"
 
 	"../config"
 	"../teams"
@@ -39,6 +40,7 @@ func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 			[]teams.TeamScore{},
 		}
 		fmt.Println("Got teams", teamInfo)
+		sort.Sort(teams.TeamByScore(teamInfo))
 		for _, team := range teamInfo {
 			data.Teams = append(data.Teams, teams.TeamScore{team.Name, team.Members, team.Score})
 		}

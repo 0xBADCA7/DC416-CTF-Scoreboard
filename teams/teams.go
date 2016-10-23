@@ -124,6 +124,22 @@ type Team struct {
 	SubmitToken string
 }
 
+// TeamByScore is an alias for an array of teams that implements all of the interfaces required by
+// the sort package to be able to sort teams by their score.
+type TeamByScore []Team
+
+func (t TeamByScore) Len() int {
+	return len(t)
+}
+
+func (t TeamByScore) Swap(i, j int) {
+	t[i], t[j] = t[j], t[i]
+}
+
+func (t TeamByScore) Less(i, j int) bool {
+	return t[i].Score > t[j].Score
+}
+
 // Save creates a new Team in the database.
 func (t *Team) Save(db *sql.DB) error {
 	uniqueToken := generateUniqueToken(db)
