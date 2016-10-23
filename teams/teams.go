@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/hex"
 	"fmt"
+	"time"
 )
 
 const (
@@ -13,7 +14,8 @@ const (
 		name text,
 		members text,
 		score integer,
-		token text unique
+		token text unique,
+		last_valid_submission timestamp
 );`
 
 	QInitSubmitted = `create table if not exists submitted (
@@ -24,24 +26,24 @@ const (
 	);`
 
 	QGetTeams = `
-select id, name, members, score, token
+select id, name, members, score, token, last_valid_submission
 from teams;`
 
 	QCreateTeam = `
 insert into teams (
-	name, members, score, token
+	name, members, score, token, last_valid_submission
 ) values (
-	?, ?, 0, ?
+	?, ?, 0, ?, datetime(0, 'unixepoch', 'localtime');
 );`
 
 	QFindTeamBySubmissionToken = `
-select id, name, members, score
+select id, name, members, score, last_valid_submission
 from teams
 where token = ?;`
 
 	QUpdateTeam = `
 update teams
-set score = ?, token = ?
+set score = ?, token = ?, last_valid_submission = ?
 where id = ?;`
 
 	QFindSubmission = `
@@ -94,7 +96,7 @@ func FindTeams(db *sql.DB) ([]Team, error) {
 	teams := []Team{}
 	for rows.Next() {
 		team := Team{}
-		err = rows.Scan(&team.Id, &team.Name, &team.Members, &team.Score, &team.SubmitToken)
+		err = rows.Scan(&team.Id, &team.Name, &team.Members, &team.Score, &team.SubmitToken, &team.LastSubmission)
 		if err == nil {
 			teams = append(teams, team)
 		}
@@ -107,7 +109,7 @@ func FindTeamByToken(db *sql.DB, token string) (Team, error) {
 	team := Team{}
 	fmt.Println("looking for team with token", token)
 	err := db.QueryRow(QFindTeamBySubmissionToken, token).Scan(
-		&team.Id, &team.Name, &team.Members, &team.Score)
+		&team.Id, &team.Name, &team.Members, &team.Score, &team.LastSubmission)
 	if err != nil {
 		return Team{}, err
 	}
@@ -117,11 +119,12 @@ func FindTeamByToken(db *sql.DB, token string) (Team, error) {
 
 // Team contains information about teams that should never be served to users.
 type Team struct {
-	Id          int
-	Name        string
-	Members     string
-	Score       int
-	SubmitToken string
+	Id             int
+	Name           string
+	Members        string
+	Score          int
+	SubmitToken    string
+	LastSubmission time.Time
 }
 
 // TeamByScore is an alias for an array of teams that implements all of the interfaces required by
@@ -137,6 +140,9 @@ func (t TeamByScore) Swap(i, j int) {
 }
 
 func (t TeamByScore) Less(i, j int) bool {
+	if t[i].Score == t[j].Score {
+		return t[j].LastSubmission.After(t[i].LastSubmission)
+	}
 	return t[i].Score > t[j].Score
 }
 
@@ -150,7 +156,7 @@ func (t *Team) Save(db *sql.DB) error {
 
 // Update resets the team's score and allows for changing their submission token.
 func (t *Team) Update(db *sql.DB) error {
-	_, err := db.Exec(QUpdateTeam, t.Score, t.SubmitToken, t.Id)
+	_, err := db.Exec(QUpdateTeam, t.Score, t.SubmitToken, t.LastSubmission, t.Id)
 	return err
 }
 

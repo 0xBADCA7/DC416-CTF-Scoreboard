@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path"
 	"strings"
+	"time"
 
 	"../config"
 	"../teams"
@@ -101,6 +102,7 @@ func handleSubmission(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *
 		return
 	}
 	team.Score += flag.Reward
+	team.LastSubmission = time.Now()
 	err = team.Update(db)
 	if err != nil {
 		fmt.Println(err)
