@@ -1,7 +1,9 @@
 package teams
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 )
 
@@ -30,7 +32,7 @@ from teams;`
 insert into teams (
 	name, members, score, token
 ) values (
-	?, ?, 0, ''
+	?, ?, 0, ?
 );`
 
 	QFindTeamBySubmissionToken = `
@@ -64,6 +66,24 @@ func InitTables(db *sql.DB) error {
 	}
 	_, err = db.Exec(QInitSubmitted)
 	return err
+}
+
+// generateUniqueToken creates a new 32-character hex-encoded string that is unique and can
+// be used as a security token by teams submitting flags.
+func generateUniqueToken(db *sql.DB) string {
+	buffer := make([]byte, 16)
+	for {
+		bytesRead, err := rand.Read(buffer)
+		if err != nil || bytesRead != 16 {
+			fmt.Println("Could not read random bytes for token.", err)
+			continue
+		}
+		token := hex.EncodeToString(buffer)
+		_, err = FindTeamByToken(db, token)
+		if err != nil {
+			return token
+		}
+	}
 }
 
 // FindTeams obtains the current status of all of the teams.
@@ -107,7 +127,9 @@ type Team struct {
 
 // Save creates a new Team in the database.
 func (t *Team) Save(db *sql.DB) error {
-	_, err := db.Exec(QCreateTeam, t.Name, t.Members)
+	uniqueToken := generateUniqueToken(db)
+	t.SubmitToken = uniqueToken
+	_, err := db.Exec(QCreateTeam, t.Name, t.Members, t.SubmitToken)
 	return err
 }
 
