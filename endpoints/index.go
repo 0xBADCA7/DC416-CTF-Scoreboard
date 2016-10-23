@@ -1,0 +1,49 @@
+package endpoints
+
+import (
+	"database/sql"
+	"fmt"
+	"html/template"
+	"net/http"
+	"path"
+	"sort"
+
+	"../config"
+	"../teams"
+)
+
+// Index creates a request handler that serves index.html, the main scoreboard page with all of
+// the teams and their scores.
+func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "index.html"))
+		if err != nil {
+			fmt.Println("Error parsing template", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "text/plain")
+			w.Write([]byte("We done goofed! Try again in a few minutes."))
+			return
+		}
+		teamInfo, err := teams.FindTeams(db)
+		if err != nil {
+			fmt.Println("Error finding teams", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "text/plain")
+			w.Write([]byte("We done goofed! Try again in a few minutes."))
+			return
+		}
+		data := struct {
+			CTF   string
+			Teams []teams.TeamScore
+		}{
+			cfg.CTFName,
+			[]teams.TeamScore{},
+		}
+		fmt.Println("Got teams", teamInfo)
+		sort.Sort(teams.TeamByScore(teamInfo))
+		for _, team := range teamInfo {
+			data.Teams = append(data.Teams, teams.TeamScore{team.Name, team.Members, team.Score})
+		}
+		t.Execute(w, data)
+	}
+}

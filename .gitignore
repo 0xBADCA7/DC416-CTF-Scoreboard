@@ -3,6 +3,13 @@
 *.a
 *.so
 
+# Compiled binary
+main
+IVScoreboard
+
+# Database file
+scoreboard.db
+
 # Folders
 _obj
 _test

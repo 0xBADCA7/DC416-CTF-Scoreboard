@@ -1,0 +1,18 @@
+{
+  "ctfName": "Defcon Toronto Offline CTF",
+  "bindAddress": "0.0.0.0:3000",
+  "dbFile": "scoreboard.db",
+  "htmlDir": "html",
+  "flags": [
+    {
+      "id": 1,
+      "secret": "secret1",
+      "reward": 10
+    },
+    {
+      "id": 2,
+      "secret": "secret2",
+      "reward": 20
+    }
+  ]
+}
