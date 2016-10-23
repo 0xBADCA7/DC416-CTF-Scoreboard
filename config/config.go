@@ -16,6 +16,7 @@ type Flag struct {
 type Config struct {
 	BindAddress  string `json:"bindAddress"` // The address to bind the server to, formatted <ip>:<port>
 	DatabaseFile string `json:"dbFile"`      // The name of the file to have SQLite save the database state to
+	CTFName      string `json:"ctfName"`     // The name of the CTF event, to display over the scoreboard
 	HTMLDir      string `json:"htmlDir"`     // The path to the directory housing HTML files, relative to main.go
 	Flags        []Flag `json:"flags"`       // Information about flags that users can submit to get points
 }

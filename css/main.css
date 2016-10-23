@@ -1,7 +1,83 @@
 html {
-  background-color: black;
+  background-color: #100a0a;
 }
 
 * {
   color: grey;
+  font-family: 'Roboto', sans-serif;
+}
+
+table th {
+  font-size: 1.3em;
+}
+
+tr {
+  height: 35px;
+}
+
+td {
+  color: #1d1d1d;
+}
+
+input[type=text] {
+  width: 400px;
+}
+
+button[type=submit] {
+  width: 250px;
+}
+
+tr:nth-child(odd) {
+  background-color: #cccccc;
+}
+
+tr:nth-child(even) {
+  background-color: #b5b5b5;
+}
+
+div.center {
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 20px;
+}
+
+div.center h1 {
+  text-align: center;
+}
+
+div.center a {
+  font-size: 0.8em;
+}
+
+div.center form {
+  text-align: center;
+}
+
+div.center form div {
+  margin-left: -100px;
+}
+
+div.center form div.pure-controls {
+  margin-left: -70px !important;
+}
+
+div#main {
+  width: 60%;
+}
+
+table#scoreboard {
+  width: 100%;
+}
+
+table#scoreboard * {
+  text-align: center;  
+}
+
+tr#scoreheader {
+  background-color: #3b263e;
+}
+
+tr#scoreheader th {
+  color: #f7f7f7;
 }

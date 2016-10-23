@@ -32,10 +32,10 @@ func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 			return
 		}
 		data := struct {
-			Message string
-			Teams   []teams.TeamScore
+			CTF   string
+			Teams []teams.TeamScore
 		}{
-			"Hello DC416!",
+			cfg.CTFName,
 			[]teams.TeamScore{},
 		}
 		fmt.Println("Got teams", teamInfo)
