@@ -12,15 +12,17 @@
       <h1>{{.CTF}} Scoreboard</h1>
       <table id="scoreboard">
         <tr id="scoreheader">
+          <th>Place</th>
           <th>Team Name</th>
           <th>Score</th>
           <th>Members</th>
         </tr>
-        {{range .Teams}}
+        {{range $i, $t := .Teams}}
         <tr>
-          <td>{{.Name}}</td>
-          <td>{{.Score}}</td>
-          <td>{{.Members}}</td>
+          <td>{{$i}}</td>
+          <td>{{$t.Name}}</td>
+          <td>{{$t.Score}}</td>
+          <td>{{$t.Members}}</td>
         </tr>
         {{end}}
       </table>
