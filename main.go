@@ -13,7 +13,7 @@ import (
 )
 
 func main() {
-	cfg := config.Default()
+	cfg := config.MustLoad("./config/config.json")
 
 	db, err := sql.Open("sqlite3", cfg.DatabaseFile)
 	if err != nil {
