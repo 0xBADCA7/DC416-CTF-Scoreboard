@@ -27,7 +27,6 @@ const (
 select id, name, members, score, token
 from teams;`
 
-	// TODO - Create a submission token for inclusion upon team creation
 	QCreateTeam = `
 insert into teams (
 	name, members, score, token

@@ -24,6 +24,9 @@ func main() {
 		panic(err)
 	}
 
+	http.Handle("/css/", http.FileServer(http.Dir(".")))
+	http.Handle("/js/", http.FileServer(http.Dir(".")))
+	http.Handle("/img/", http.FileServer(http.Dir(".")))
 	http.HandleFunc("/", endpoints.Index(db, &cfg))
 	http.HandleFunc("/register", endpoints.Register(db, &cfg))
 	http.HandleFunc("/submit", endpoints.Submit(db, &cfg))
