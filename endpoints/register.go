@@ -56,7 +56,11 @@ func registerNewTeam(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *h
 		w.Write([]byte(""))
 		return
 	}
-	w.Write([]byte("Your team has successfully been registered"))
+	msg := fmt.Sprintf(`Your team has successfully been registered.
+Your submission token is %s.
+Please make sure not to lose or share it with anyone not on your team.`,
+		team.SubmitToken)
+	w.Write([]byte(msg))
 }
 
 // registerPage serves the register.html page which contains a form that users can fill out
