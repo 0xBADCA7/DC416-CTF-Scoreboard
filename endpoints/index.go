@@ -4,7 +4,9 @@ import (
 	"database/sql"
 	"fmt"
 	"html/template"
+	"io/ioutil"
 	"net/http"
+	"os"
 	"path"
 	"sort"
 
@@ -16,9 +18,20 @@ import (
 // the teams and their scores.
 func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "index.html"))
+		funcs := template.FuncMap{
+			"increment": func(a int) string { return fmt.Sprintf("%d", a+1) },
+		}
+		templateFile, err := os.Open(path.Join(cfg.HTMLDir, "index.html"))
 		if err != nil {
 			fmt.Println("Error parsing template", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "text/plain")
+			w.Write([]byte("We done goofed! Try again in a few minutes."))
+			return
+		}
+		templateCode, readErr := ioutil.ReadAll(templateFile)
+		if readErr != nil {
+			fmt.Println("Error reading template for index.html", readErr)
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Header().Set("Content-Type", "text/plain")
 			w.Write([]byte("We done goofed! Try again in a few minutes."))
@@ -43,6 +56,14 @@ func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 		sort.Sort(teams.TeamByScore(teamInfo))
 		for _, team := range teamInfo {
 			data.Teams = append(data.Teams, teams.TeamScore{team.Name, team.Members, team.Score})
+		}
+		t, err := template.New("index").Funcs(funcs).Parse(string(templateCode))
+		if err != nil {
+			fmt.Println("Error building template", err)
+			w.WriteHeader(http.StatusInternalServerError)
+			w.Header().Set("Content-Type", "text/plain")
+			w.Write([]byte("We done goofed! Try again in a few minutes."))
+			return
 		}
 		t.Execute(w, data)
 	}
