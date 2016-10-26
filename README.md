@@ -105,3 +105,8 @@ You should see output like the following and be able to verify in your browser t
 Listening on 0.0.0.0:3000
 ```
 
+
+### Submitting flags using curl
+```
+curl --data "token=TOKEN&flag=FLAG" ctf.server.com:3000/submit
+```
