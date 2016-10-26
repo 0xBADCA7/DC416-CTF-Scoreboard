@@ -53,7 +53,7 @@ func registerNewTeam(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *h
 	err = team.Save(db)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte(""))
+		w.Write([]byte("Could not create your team. Please make sure your name is not taken."))
 		return
 	}
 	msg := fmt.Sprintf(`Your team has successfully been registered.

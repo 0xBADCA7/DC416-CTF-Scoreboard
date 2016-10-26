@@ -11,7 +11,7 @@ import (
 const (
 	QInitTeamTable = `create table if not exists teams (
 		id integer primary key,
-		name text,
+		name text unique,
 		members text,
 		score integer,
 		token text unique,
