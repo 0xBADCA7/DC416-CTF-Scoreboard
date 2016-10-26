@@ -19,7 +19,7 @@
         </tr>
         {{range $i, $t := .Teams}}
         <tr>
-          <td>{{$i}}</td>
+          <td>{{increment $i}}</td>
           <td>{{$t.Name}}</td>
           <td>{{$t.Score}}</td>
           <td>{{$t.Members}}</td>
