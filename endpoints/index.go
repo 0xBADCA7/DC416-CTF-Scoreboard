@@ -9,6 +9,7 @@ import (
 	"os"
 	"path"
 	"sort"
+	"time"
 
 	"../config"
 	"../teams"
@@ -55,7 +56,16 @@ func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 		fmt.Println("Got teams", teamInfo)
 		sort.Sort(teams.TeamByScore(teamInfo))
 		for _, team := range teamInfo {
-			data.Teams = append(data.Teams, teams.TeamScore{team.Name, team.Members, team.Score})
+			lastSubmitted := "No flags submitted yet"
+			if team.LastSubmission.After(time.Date(2015, time.January, 1, 1, 0, 0, 0, time.UTC)) {
+				lastSubmitted = team.LastSubmission.String()
+			}
+			data.Teams = append(data.Teams, teams.TeamScore{
+				team.Name,
+				team.Members,
+				team.Score,
+				lastSubmitted,
+			})
 		}
 		t, err := template.New("index").Funcs(funcs).Parse(string(templateCode))
 		if err != nil {
