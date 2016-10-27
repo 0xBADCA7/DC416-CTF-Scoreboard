@@ -194,7 +194,8 @@ func (s *Submission) Save(db *sql.DB) error {
 // TeamScore contains information about a team's score.
 // It is safe to serve a TeamScore to users.
 type TeamScore struct {
-	Name    string `json:"teamName"` // The name of the team
-	Members string `json:"members"`  // The names of members, a single comma-separated string
-	Score   int    `json:"score"`    // The team's score, as an integer
+	Name      string `json:"teamName"`  // The name of the team
+	Members   string `json:"members"`   // The names of members, a single comma-separated string
+	Score     int    `json:"score"`     // The team's score, as an integer
+	Submitted string `json:"submitted"` // The time that the team's last submission occurred at
 }
