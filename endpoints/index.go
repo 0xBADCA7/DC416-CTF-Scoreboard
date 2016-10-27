@@ -58,7 +58,7 @@ func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 		for _, team := range teamInfo {
 			lastSubmitted := "No flags submitted yet"
 			if team.LastSubmission.After(time.Date(2015, time.January, 1, 1, 0, 0, 0, time.UTC)) {
-				lastSubmitted = team.LastSubmission.String()
+				lastSubmitted = team.LastSubmission.Local().Format(time.UnixDate)
 			}
 			data.Teams = append(data.Teams, teams.TeamScore{
 				team.Name,
