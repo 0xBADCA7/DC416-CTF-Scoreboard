@@ -39,13 +39,13 @@ func registerNewTeam(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *h
 	names, found := r.Form["name"]
 	if !found || len(names) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("You did submit a team name"))
+		w.Write([]byte("You did not submit a team name"))
 		return
 	}
 	members, found := r.Form["members"]
 	if !found || len(members) == 0 {
 		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("You did submit your members' names"))
+		w.Write([]byte("You did not submit your members' names"))
 		return
 	}
 	team.Name = names[0]
