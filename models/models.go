@@ -41,6 +41,17 @@ insert into teams (
 	?, ?, 0, ?, datetime(0, 'unixepoch', 'localtime')
 );`
 
+	QCreateSession = `
+insert into sessions (
+	token, created_at, expires_at
+) values (
+	?, ?, ?
+);`
+
+	QDeleteSession = `
+delete from sessions
+where token = ?;`
+
 	QFindTeamBySubmissionToken = `
 select id, name, members, score, last_valid_submission
 from teams

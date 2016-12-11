@@ -76,7 +76,6 @@ func (t *Team) Save(db *sql.DB) error {
 	})
 	t.SubmitToken = uniqueToken
 	_, err := db.Exec(QCreateTeam, t.Name, t.Members, t.SubmitToken)
-	fmt.Println("---", err)
 	return err
 }
 

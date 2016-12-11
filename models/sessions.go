@@ -44,14 +44,19 @@ func NewSession() Session {
 // Save attempts to save a session token, first generating the actual token value itself,
 // guaranteeing it is unique.
 func (s *Session) Save(db *sql.DB) error {
-	// TODO - Implement me
-	return nil
+	uniqueToken := generateUniqueToken(func(token string) bool {
+		_, err := FindSession(db, token)
+		return err != nil
+	})
+	s.Token = uniqueToken
+	_, err := db.Exec(QCreateSession, s.Token, s.Created, s.Expires)
+	return err
 }
 
 // Delete removes a session token from the database.
 func (s *Session) Delete(db *sql.DB) error {
-	// TODO - Implement me
-	return nil
+	_, err := db.Exec(QDeleteSession, s.Token)
+	return err
 }
 
 // IsExpired determines if a session token is expired and should, consequently, be
