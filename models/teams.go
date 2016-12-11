@@ -1,7 +1,9 @@
 package models
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
 	"fmt"
 	"time"
 )
@@ -37,6 +39,24 @@ func FindTeamByToken(db *sql.DB, token string) (Team, error) {
 	}
 	team.SubmitToken = token
 	return team, err
+}
+
+// generateUniqueToken creates a new 32-character hex-encoded string that is unique and can
+// be used as a security token by teams submitting flags.
+func generateUniqueToken(db *sql.DB) string {
+	buffer := make([]byte, 16)
+	for {
+		bytesRead, err := rand.Read(buffer)
+		if err != nil || bytesRead != 16 {
+			fmt.Println("Could not read random bytes for token.", err)
+			continue
+		}
+		token := hex.EncodeToString(buffer)
+		_, err = FindTeamByToken(db, token)
+		if err != nil {
+			return token
+		}
+	}
 }
 
 // Team contains information about teams that should never be served to users.
