@@ -10,7 +10,7 @@ import (
 
 	"./config"
 	"./endpoints"
-	"./teams"
+	"./models"
 )
 
 func main() {
@@ -25,7 +25,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	err = teams.InitTables(db)
+	err = models.InitTables(db)
 	if err != nil {
 		panic(err)
 	}
@@ -36,6 +36,7 @@ func main() {
 	http.HandleFunc("/", endpoints.Index(db, &cfg))
 	http.HandleFunc("/register", endpoints.Register(db, &cfg))
 	http.HandleFunc("/submit", endpoints.Submit(db, &cfg))
+	http.HandleFunc("/login", endpoints.Login(db, &cfg))
 	fmt.Println("Listening on", cfg.BindAddress)
 	http.ListenAndServe(cfg.BindAddress, nil)
 }

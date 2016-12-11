@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"../config"
-	"../teams"
+	"../models"
 )
 
 // Register presents a page which users can use to register.
@@ -26,7 +26,7 @@ func Register(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 // registerNewTeam handles a POST request that contains new team data and creates a team
 // in the database.
 func registerNewTeam(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
-	team := teams.Team{}
+	team := models.Team{}
 	fmt.Println("Got a POST request to register a new team")
 	err := r.ParseForm()
 	w.Header().Set("Content-Type", "text/plain")

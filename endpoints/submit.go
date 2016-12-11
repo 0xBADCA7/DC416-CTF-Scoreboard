@@ -10,7 +10,7 @@ import (
 	"time"
 
 	"../config"
-	"../teams"
+	"../models"
 )
 
 // Submit handles POST requests to submit new flags and adjust team scores.
@@ -66,7 +66,7 @@ func handleSubmission(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *
 		w.Write([]byte("Missing the flag field. Please supply secret flag."))
 		return
 	}
-	team, err := teams.FindTeamByToken(db, tokens[0])
+	team, err := models.FindTeamByToken(db, tokens[0])
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -86,7 +86,7 @@ func handleSubmission(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *
 		w.Write([]byte("The flag you submitted is invalid. Please check that it is formatted correctly."))
 		return
 	}
-	submission, err := teams.FindSubmission(db, team.Id, flag.Id)
+	submission, err := models.FindSubmission(db, team.Id, flag.Id)
 	if err == nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("You cannot submit the same flag multiple times."))

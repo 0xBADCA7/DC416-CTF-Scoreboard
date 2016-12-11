@@ -12,7 +12,7 @@ import (
 	"time"
 
 	"../config"
-	"../teams"
+	"../models"
 )
 
 // Index creates a request handler that serves index.html, the main scoreboard page with all of
@@ -38,7 +38,7 @@ func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 			w.Write([]byte("We done goofed! Try again in a few minutes."))
 			return
 		}
-		teamInfo, err := teams.FindTeams(db)
+		teamInfo, err := models.FindTeams(db)
 		if err != nil {
 			fmt.Println("Error finding teams", err)
 			w.WriteHeader(http.StatusInternalServerError)
@@ -48,19 +48,19 @@ func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 		}
 		data := struct {
 			CTF   string
-			Teams []teams.TeamScore
+			Teams []models.TeamScore
 		}{
 			cfg.CTFName,
-			[]teams.TeamScore{},
+			[]models.TeamScore{},
 		}
 		fmt.Println("Got teams", teamInfo)
-		sort.Sort(teams.TeamByScore(teamInfo))
+		sort.Sort(models.TeamByScore(teamInfo))
 		for _, team := range teamInfo {
 			lastSubmitted := "No flags submitted yet"
 			if team.LastSubmission.After(time.Date(2015, time.January, 1, 1, 0, 0, 0, time.UTC)) {
 				lastSubmitted = team.LastSubmission.Local().Format(time.UnixDate)
 			}
-			data.Teams = append(data.Teams, teams.TeamScore{
+			data.Teams = append(data.Teams, models.TeamScore{
 				team.Name,
 				team.Members,
 				team.Score,
