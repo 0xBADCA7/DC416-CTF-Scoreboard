@@ -1,7 +1,10 @@
 package models
 
 import (
+	"crypto/rand"
 	"database/sql"
+	"encoding/hex"
+	"fmt"
 )
 
 const (
@@ -78,4 +81,21 @@ func InitTables(db *sql.DB) error {
 	}
 	_, err = db.Exec(QInitSubmitted)
 	return err
+}
+
+// generateUniqueToken creates a new 32-character hex-encoded string that is unique and can be used
+// for things like authenticated session tokens and team submission tokens.
+func generateUniqueToken(uniqueTest func(string) bool) string {
+	buffer := make([]byte, 16)
+	for {
+		bytesRead, err := rand.Read(buffer)
+		if err != nil || bytesRead != 16 {
+			fmt.Println("Could not read random bytes for token.", err)
+			continue
+		}
+		token := hex.EncodeToString(buffer)
+		if uniqueTest(token) {
+			return token
+		}
+	}
 }
