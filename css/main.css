@@ -19,7 +19,7 @@ td {
   color: #1d1d1d;
 }
 
-input[type=text] {
+input[type=text], input[type=password] {
   width: 400px;
 }
 
