@@ -5,10 +5,14 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
+	"os"
 	"path"
 	"strings"
 
+	auth "github.com/StratumSecurity/scryptauth"
+
 	"../config"
+	"../models"
 )
 
 // Login presents routes GET requests to serve a login page for admins and POST
@@ -26,9 +30,45 @@ func Login(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 // adminLogin checks the password provided to the application against a configured password,
 // granting access to the admin dashboard if the credentials are correct.
 func adminLogin(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
-	// TODO - Implement me
-	fmt.Println("Ignoring login submission")
-	w.Write([]byte("Rejected"))
+	err := r.ParseForm()
+	badPwdMsg := []byte("Incorrect password")
+	if err != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write(badPwdMsg)
+		return
+	}
+	password, found := r.Form["password"]
+	if !found {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write(badPwdMsg)
+		return
+	}
+	expected := os.Getenv(config.PasswordEnvVar)
+	matchErr := auth.CompareHashAndPassword([]byte(expected), []byte(password[0]))
+	if matchErr != nil {
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write(badPwdMsg)
+		return
+	}
+	session := models.NewSession()
+	saveErr := session.Save(db)
+	if saveErr != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte(fmt.Sprintf("Could not log in. Reason: %s\n", saveErr.Error())))
+		return
+	}
+	fmt.Println("Successful admin login by", r.RemoteAddr)
+	http.SetCookie(w, &http.Cookie{
+		Name:    models.SessionCookieName,
+		Value:   session.Token,
+		Expires: session.Expires,
+	})
+	// adminURL defined in endpoints/admin.go
+	http.Redirect(w, r, adminURL, http.StatusSeeOther)
 }
 
 // loginPage serves a page containing a login form for admins to access the admin dashboard.

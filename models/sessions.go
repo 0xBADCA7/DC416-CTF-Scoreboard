@@ -6,6 +6,10 @@ import (
 	"time"
 )
 
+// SessionCookieName is the name to give the cookie stored in the user's browser
+// containing their session token.
+const SessionCookieName = "session"
+
 // Admin session tokens will be allowed to live for 12 hours.
 const tokenLifetime = 12 * time.Hour
 
