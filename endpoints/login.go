@@ -47,7 +47,7 @@ func adminLogin(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.R
 	}
 	expected := os.Getenv(config.PasswordEnvVar)
 	matchErr := auth.CompareHashAndPassword([]byte(expected), []byte(password[0]))
-	if matchErr != nil {
+	if len(expected) == 0 || matchErr != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write(badPwdMsg)
