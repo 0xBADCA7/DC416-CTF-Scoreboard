@@ -75,13 +75,7 @@ func loadTeamInfo(db *sql.DB, cfg *config.Config) ([]adminTeamInfo, error) {
 // about teams.
 func Admin(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		sessionCookie, err := r.Cookie(models.SessionCookieName)
-		noAccessMsg := []byte("Access denied")
-		if err != nil {
-			http.Redirect(w, r, "/", http.StatusOK)
-			return
-		}
-		authErr := authentication.CheckAuthorization(db, sessionCookie.Value)
+		authErr := authentication.CheckSessionToken(r, db)
 		if authErr != nil {
 			http.SetCookie(w, &http.Cookie{
 				Name:    models.SessionCookieName,
@@ -90,7 +84,7 @@ func Admin(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 			})
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Header().Set("Content-Type", "text/plain")
-			w.Write(noAccessMsg)
+			w.Write([]byte("Access Denied"))
 			return
 		}
 		t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "admin.html"))

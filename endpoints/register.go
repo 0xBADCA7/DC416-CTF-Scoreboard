@@ -8,6 +8,7 @@ import (
 	"path"
 	"strings"
 
+	"../authentication"
 	"../config"
 	"../models"
 )
@@ -15,7 +16,10 @@ import (
 // Register presents a page which users can use to register.
 func Register(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if strings.ToUpper(r.Method) == "POST" {
+		authErr := authentication.CheckSessionToken(r, db)
+		if authErr != nil {
+			http.Redirect(w, r, "/", http.StatusSeeOther)
+		} else if strings.ToUpper(r.Method) == "POST" {
 			registerNewTeam(db, cfg, w, r)
 		} else {
 			registerPage(db, cfg, w, r)

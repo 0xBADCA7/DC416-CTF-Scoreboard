@@ -3,6 +3,7 @@ package authentication
 import (
 	"database/sql"
 	"errors"
+	"net/http"
 	"os"
 
 	auth "github.com/StratumSecurity/scryptauth"
@@ -28,6 +29,17 @@ func CheckAuthorization(db *sql.DB, submittedToken string) error {
 		return ErrExpiredToken
 	}
 	return nil
+}
+
+// CheckSessionToken looks for an appropriately named `session` cookie
+// in the provided request and then tests whether the session id
+// sent is valid.
+func CheckSessionToken(r *http.Request, db *sql.DB) error {
+	sessionCookie, err := r.Cookie(models.SessionCookieName)
+	if err != nil {
+		return err
+	}
+	return CheckAuthorization(db, sessionCookie.Value)
 }
 
 // HashAdminPassword applies a secure scrypt-based password hash
