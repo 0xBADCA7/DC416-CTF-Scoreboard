@@ -66,18 +66,18 @@ div#main {
   width: 60%;
 }
 
-table#scoreboard {
+table#scoreboard, table#teams {
   width: 100%;
 }
 
-table#scoreboard * {
+table#scoreboard *, table#teams * {
   text-align: center;  
 }
 
-tr#scoreheader {
+tr#scoreheader, tr#teamsheader {
   background-color: #3b263e;
 }
 
-tr#scoreheader th {
+tr#scoreheader th, tr#teamsheader th {
   color: #f7f7f7;
 }
