@@ -67,6 +67,12 @@ select id
 from submitted
 where team_id = ? and flag_id = ?;`
 
+	QFindAllSubmissions = `
+select id, flag_id
+from submitted
+where team_id = ?
+order by id asc;`
+
 	QFindSessionToken = `
 select created_at, expires_at
 from sessions
