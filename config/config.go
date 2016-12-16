@@ -5,10 +5,6 @@ import (
 	"os"
 )
 
-// PasswordEnvVar is the name of the environment variable that we expect the password for admin access
-// to be provided under.
-const PasswordEnvVar = "IVS_PASSWORD"
-
 // Flag contains a unique identifier
 type Flag struct {
 	Id     int    `json:"id"`

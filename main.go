@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"os"
 
-	auth "github.com/StratumSecurity/scryptauth"
 	_ "github.com/mattn/go-sqlite3"
 
+	"./authentication"
 	"./config"
 	"./endpoints"
 	"./models"
@@ -31,15 +31,7 @@ func main() {
 		panic(err)
 	}
 
-	adminPwd := os.Getenv(config.PasswordEnvVar)
-	if len(adminPwd) > 0 {
-		hashParams := auth.DefaultHashConfiguration()
-		hashed, hashErr := auth.GenerateFromPassword([]byte(adminPwd), hashParams)
-		if hashErr != nil {
-			panic(hashErr)
-		}
-		os.Setenv(config.PasswordEnvVar, string(hashed))
-	}
+	authentication.HashAdminPassword()
 
 	http.Handle("/css/", http.FileServer(http.Dir(".")))
 	http.Handle("/js/", http.FileServer(http.Dir(".")))

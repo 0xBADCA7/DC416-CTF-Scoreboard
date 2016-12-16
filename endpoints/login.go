@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"html/template"
 	"net/http"
-	"os"
 	"path"
 	"strings"
 
-	auth "github.com/StratumSecurity/scryptauth"
-
+	"../authentication"
 	"../config"
 	"../models"
 )
@@ -45,9 +43,8 @@ func adminLogin(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.R
 		w.Write(badPwdMsg)
 		return
 	}
-	expected := os.Getenv(config.PasswordEnvVar)
-	matchErr := auth.CompareHashAndPassword([]byte(expected), []byte(password[0]))
-	if len(expected) == 0 || matchErr != nil {
+	authErr := authentication.AdminLogin(db, password[0])
+	if authErr != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write(badPwdMsg)

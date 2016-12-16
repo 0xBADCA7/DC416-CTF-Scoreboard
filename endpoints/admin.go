@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path"
 
+	"../authentication"
 	"../config"
 	"../models"
 )
@@ -77,10 +78,11 @@ func Admin(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 			w.Write(noAccessMsg)
 			return
 		}
-		_, findErr := models.FindSession(db, sessionCookie.Value)
-		if findErr != nil {
+		authErr := authentication.CheckAuthorization(db, sessionCookie.Value)
+		if authErr != nil {
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Header().Set("Content-Type", "text/plain")
+			fmt.Println("Auth error:", authErr.Error())
 			w.Write(noAccessMsg)
 			return
 		}
