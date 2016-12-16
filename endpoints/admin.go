@@ -69,14 +69,16 @@ func loadTeamInfo(db *sql.DB, cfg *config.Config) ([]adminTeamInfo, error) {
 	return teamInfo, nil
 }
 
+// Admin handles requests for /admin, redirecting to / if no session token
+// is received before testing whether the user has authenticated.
+// Authenticated users are served a page containing secret information
+// about teams.
 func Admin(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		sessionCookie, err := r.Cookie(models.SessionCookieName)
 		noAccessMsg := []byte("Access denied")
 		if err != nil {
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Header().Set("Content-Type", "text/plain")
-			w.Write(noAccessMsg)
+			http.Redirect(w, r, "/", http.StatusOK)
 			return
 		}
 		authErr := authentication.CheckAuthorization(db, sessionCookie.Value)
