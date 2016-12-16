@@ -6,6 +6,7 @@ import (
 	"html/template"
 	"net/http"
 	"path"
+	"time"
 
 	"../authentication"
 	"../config"
@@ -80,9 +81,13 @@ func Admin(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 		}
 		authErr := authentication.CheckAuthorization(db, sessionCookie.Value)
 		if authErr != nil {
+			http.SetCookie(w, &http.Cookie{
+				Name:    models.SessionCookieName,
+				Value:   "",
+				Expires: time.Now(),
+			})
 			w.WriteHeader(http.StatusUnauthorized)
 			w.Header().Set("Content-Type", "text/plain")
-			fmt.Println("Auth error:", authErr.Error())
 			w.Write(noAccessMsg)
 			return
 		}

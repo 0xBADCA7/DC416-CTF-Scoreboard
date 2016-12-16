@@ -66,5 +66,5 @@ func (s *Session) Delete(db *sql.DB) error {
 // IsExpired determines if a session token is expired and should, consequently, be
 // rejected for administrative applicaions.
 func (s *Session) IsExpired() bool {
-	return s.Expires.After(time.Now())
+	return time.Now().After(s.Expires)
 }
