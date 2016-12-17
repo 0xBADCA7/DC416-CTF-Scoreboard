@@ -78,6 +78,11 @@ tr#scoreheader, tr#teamsheader {
   background-color: #3b263e;
 }
 
-tr#scoreheader th, tr#teamsheader th {
+tr#scoreheader th {
   color: #f7f7f7;
+}
+
+tr#teamsheader th {
+  color: #f7f7f7;
+  min-width: 20px;
 }
