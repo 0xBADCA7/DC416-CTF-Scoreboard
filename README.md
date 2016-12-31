@@ -92,18 +92,28 @@ You can run the server one of two ways. The simplest is to just run the newly co
 ./IVScoreboard
 ```
 
-This will run the web server and try to load a configuration from `config/config.json`, relative to the `IVScoreboard/` directory that you are running. Alternatively, you can specify another path to a configuration file of your choosing by setting the `CONFIG_FILE` environment variable to that path. For example:
+This will run the web server and try to load a configuration from `config/config.json`, relative to the `IVScoreboard/` directory that you are running.
+
+#### Environment Configuration
+
+##### Alternative configuration file
+
+You can specify another path to a configuration file of your choosing by setting the `CONFIG_FILE` environment variable to that path. For example:
 
 ```
 CONFIG_FILE=./config.json ./IVScoreboard
 ```
 
-You should see output like the following and be able to verify in your browser that going to `localhost:3000/` brings you to the scoreboard page.
+##### Administrator password
+
+In order to enable access to the admin page, you can specify a password used to log in. The password will be immediately
+hashed by the application and overwritten.
 
 ```
-./config/config.json
-Listening on 0.0.0.0:3000
+IVS_PASSWORD=S3cur3_P4ssw()rd ./IVScoreboard
 ```
+
+Now after logging in, you should be able to visit the `/admin` page.
 
 
 ### Submitting flags using curl
