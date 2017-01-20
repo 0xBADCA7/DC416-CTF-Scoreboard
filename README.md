@@ -20,7 +20,7 @@ The scoreboard uses SQLite to persist information about teams and the flags they
 
 #### scryptauth
 
-The scoreboard uses scryptauth to handle authentication to the scoreboard admin page. You will likely be able to install it via your operating system's package manager.
+The scoreboard uses scryptauth to handle credential hashing used for access to the scoreboard admin page. You will likely be able to install it via your operating system's package manager.
 
 #### The Go Toolset
 
