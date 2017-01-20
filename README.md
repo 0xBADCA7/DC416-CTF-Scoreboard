@@ -18,6 +18,10 @@ The following instructions explain how to build, configure and run the applicati
 
 The scoreboard uses SQLite to persist information about teams and the flags they have submitted. You will likely be able to install it via your operating system's package manager.
 
+#### scryptauth
+
+The scoreboard uses scryptauth to handle authentication to the scoreboard admin page. You will likely be able to install it via your operating system's package manager.
+
 #### The Go Toolset
 
 The easiest way to get the Go compiler and other tools is by installing the tool suite from the [official site](https://golang.org/dl/). Once installed, you should be able to run a command like the following and see the version of Go that you have installed.
