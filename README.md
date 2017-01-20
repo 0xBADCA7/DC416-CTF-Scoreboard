@@ -35,6 +35,7 @@ To install each of the third-party libraries required by the application, simply
 
 ```
 go get github.com/mattn/go-sqlite3
+go get github.com/StratumSecurity/scryptauth
 ```
 
 ### Configuration
