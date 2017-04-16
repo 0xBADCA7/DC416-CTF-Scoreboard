@@ -10,16 +10,19 @@
       <a href="/logout">Logout</a> |
       <a href="/register">Register a new team</a>
       <h1>Post a Message</h1>
-      <form action="/message" method="post" class="pure-form pure-form-aligned">
-        <fieldset>
-          <div class="pure-control-group">
-            <textarea name="message"></textarea>
-          </div>
-          <div class="pure-controls">
-            <button type="submit" class="pure-button pure-button-primary">Submit</button>
-          </div>
-        </fieldset>
-      </form>
+      <div class="center">
+        <form action="/message" method="post" class="pure-form pure-form-aligned">
+          <fieldset>
+            <div class="pure-control-group">
+              <label for="message">Message:</label>
+              <textarea name="message"></textarea>
+            </div>
+            <div class="pure-controls">
+              <button type="submit" class="pure-button pure-button-primary">Submit</button>
+            </div>
+          </fieldset>
+        </form>
+      </div>
       <h1>Registered Teams</h1>
       <table id="teams">
         <tr id="teamsheader">

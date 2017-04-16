@@ -76,7 +76,7 @@ ul#messages li.message {
 ul#messages li.message div.date {
   font-size: 0.8em;
   color: #1d1d1d;
-  margin-bottom: 5px;
+  margin-bottom: 5px;>
 }
 
 ul#messages li.message div.content {
