@@ -116,6 +116,10 @@ func InitTables(db *sql.DB) error {
 	if err != nil {
 		return err
 	}
+	_, err = db.Exec(QInitMessagesTable)
+	if err != nil {
+		return err
+	}
 	_, err = db.Exec(QInitSubmitted)
 	return err
 }
