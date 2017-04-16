@@ -67,10 +67,15 @@ ul#messages {
 }
 
 ul#messages li.message {
-  background-color: #ccc;
   padding: 15px;
-  border-radius: 4px;
-  margin-bottom: 20px;
+}
+
+ul#messages li.message:nth-child(odd) {
+  background-color: #ccc;
+}
+
+ul#messages li.message:nth-child(even) {
+  background-color: #b5b5b5;
 }
 
 ul#messages li.message div.date {
