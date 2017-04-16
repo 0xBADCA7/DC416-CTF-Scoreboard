@@ -30,6 +30,25 @@ const (
 		expires_at timestamp
 	);`
 
+	QInitMessagesTable = `create table if not exists messages (
+		id integer primary key,
+		content text not null,
+		created_at timestamp
+	);`
+
+	QSaveMessage = `
+insert into messages (
+	content, created_at
+) values (
+	?, ?
+);`
+
+	QAllMessages = `
+select id, content, created_at
+from messages;`
+
+	QDeleteAllMessages = `delete from messages;`
+
 	QGetTeams = `
 select id, name, members, score, token, last_valid_submission
 from teams;`
