@@ -1,8 +1,6 @@
-# IVScoreboard
+# CTF Scoreboard
 
-A scoreboard application for capture the flag events.
-
-In the future, the scoreboard application itself may include some (intentional) vulnerabilities to be exploited for bonus points.
+A scoreboard application for capture the flag events, designed with a retro hacker site aesthetic.
 
 **The Scoreboard Page**
 ![Scoreboard Screenshot](https://u.nya.is/fpwpmj.png)
@@ -24,10 +22,6 @@ The following instructions explain how to build, configure and run the applicati
 
 The scoreboard uses SQLite to persist information about teams and the flags they have submitted. You will likely be able to install it via your operating system's package manager.
 
-#### scryptauth
-
-The scoreboard uses scryptauth to handle credential hashing used for access to the scoreboard admin page. You will likely be able to install it via your operating system's package manager.
-
 #### The Go Toolset
 
 The easiest way to get the Go compiler and other tools is by installing the tool suite from the [official site](https://golang.org/dl/). Once installed, you should be able to run a command like the following and see the version of Go that you have installed.
@@ -36,8 +30,6 @@ The easiest way to get the Go compiler and other tools is by installing the tool
 $ go version
 go version go1.7.3 darwin/amd64
 ```
-
-You will probably also need to set the environment variable `GOROOT` to the path to where your base install of Go ended up in either your `.profile`, `.bashrc` or `.zshrc` file.
 
 #### Third-Party Go Libraries
 
@@ -53,8 +45,8 @@ go get github.com/StratumSecurity/scryptauth
 Once you have set up the dependencies for the project, the next step is to start configuring the server. First, clone the repository if you haven't already.
 
 ```
-git clone https://github.com/DC416/IVScoreboard
-cd IVScoreboard
+git clone https://github.com/DC416/DC416-CTF-Scoreboard.git
+cd DC416-CTF-Scoreboard 
 ```
 
 Now, open `config/config.json`. The structure of the configuration for the service is as follows:
@@ -91,19 +83,14 @@ Now, open `config/config.json`. The structure of the configuration for the servi
 
 ### Building and Running
 
-The server can be built very simply from the `IVScoreboard` directory by invoking
+The server can be built from the `DC416-CTF-Scoreboard` directory and then run by running:
 
 ```
 go build
+./DC416-CTF-Scoreboard
 ```
 
-You can run the server one of two ways. The simplest is to just run the newly compiled binary.
-
-```
-./IVScoreboard
-```
-
-This will run the web server and try to load a configuration from `config/config.json`, relative to the `IVScoreboard/` directory that you are running.
+This will run the web server and try to load a configuration from `config/config.json`, relative to the `DC416-CTF-Scoreboard/` directory that you are running.
 
 #### Environment Configuration
 
@@ -112,7 +99,7 @@ This will run the web server and try to load a configuration from `config/config
 You can specify another path to a configuration file of your choosing by setting the `CONFIG_FILE` environment variable to that path. For example:
 
 ```
-CONFIG_FILE=./config.json ./IVScoreboard
+CONFIG_FILE=./config.json ./DC416-CTF-Scoreboard
 ```
 
 ##### Administrator password
@@ -121,7 +108,7 @@ In order to enable access to the admin page, you can specify a password used to 
 hashed by the application and overwritten.
 
 ```
-IVS_PASSWORD=S3cur3_P4ssw()rd ./IVScoreboard
+CTF_PASSWORD=S3cur3_P4ssw()rd ./IVScoreboard
 ```
 
 Now after logging in, you should be able to visit the `/admin` page.
