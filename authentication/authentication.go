@@ -13,7 +13,7 @@ import (
 
 // passwordEnvVar is the name of the environment variable that we expect
 // the password for admin access to be provided under.
-const passwordEnvVar = "IVS_PASSWORD"
+const passwordEnvVar = "CTF_PASSWORD"
 
 // ErrExpiredToken is an error that indicates that a session token is expired.
 var ErrExpiredToken = errors.New("submitted token is expired")
