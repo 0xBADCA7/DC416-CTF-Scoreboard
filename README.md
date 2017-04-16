@@ -4,8 +4,14 @@ A scoreboard application for capture the flag events.
 
 In the future, the scoreboard application itself may include some (intentional) vulnerabilities to be exploited for bonus points.
 
-![Scoreboard Screenshot](https://u.pomf.is/kwamcd.png)
+**The Scoreboard Page**
+![Scoreboard Screenshot](https://u.nya.is/fpwpmj.png)
 
+**The Admin Panel**
+![Admin Panel Screenshot](https://u.nya.is/rdxsgs.png)
+
+**The Messages Page**
+![Messages Screenshot](https://u.nya.is/hcdyli.png)
 
 
 ## Running the application
