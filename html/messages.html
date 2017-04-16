@@ -1,0 +1,25 @@
+<html>
+  <head>
+    <title>CTF Scoreboard</title>
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/pure-min.css">
+    <link href="/css/roboto.css" rel="stylesheet">
+  </head>
+  <body>
+    <div id="main" class="center">
+      <h1>Messages from the Admins</h1>
+      <ul id="messages">
+        {{range .Messages}}
+        <li class="message">
+          <div class="date">
+            {{.CreatedAt}}
+          </div>
+          <div class="content">
+            {{.Content}}
+          </div>
+        </li>
+        {{end}}
+      </ul>
+    </div>
+  </body>
+</html>

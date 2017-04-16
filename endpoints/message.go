@@ -2,7 +2,10 @@ package endpoints
 
 import (
 	"database/sql"
+	"fmt"
+	"html/template"
 	"net/http"
+	"path"
 	"strings"
 
 	"../authentication"
@@ -14,10 +17,10 @@ import (
 func PostMessage(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		authErr := authentication.CheckSessionToken(r, db)
-		if authErr != nil || strings.ToUpper(r.Method) != "POST" {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-		} else {
+		if authErr == nil && strings.ToUpper(r.Method) == "POST" {
 			saveMessage(db, cfg, w, r)
+		} else {
+			messagesPage(db, cfg, w, r)
 		}
 	}
 }
@@ -44,4 +47,26 @@ func saveMessage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.
 		return
 	}
 	w.Write([]byte("Successfully saved new message."))
+}
+
+func messagesPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
+	t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "messages.html"))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte("Could not load messages."))
+		return
+	}
+	messages, findErr := models.AllMessages(db)
+	if findErr != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte("Could not load messages."))
+		return
+	}
+	fmt.Println("got messages ", messages)
+	data := struct {
+		Messages []models.Message
+	}{messages}
+	t.Execute(w, data)
 }
