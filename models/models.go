@@ -45,7 +45,8 @@ insert into messages (
 
 	QAllMessages = `
 select id, content, created_at
-from messages;`
+from messages
+order by created_at desc;`
 
 	QDeleteAllMessages = `delete from messages;`
 
