@@ -12,6 +12,15 @@ type Message struct {
 	CreatedAt time.Time `json:"created"`
 }
 
+// NewMessage constructs a new message with an invalid id until it's saved.
+func NewMessage(content string) Message {
+	return Message{
+		-1,
+		content,
+		time.Now(),
+	}
+}
+
 // AllMessages obtains all of the messages left by admins, ordered by most recently posted.
 func AllMessages(db *sql.DB) ([]Message, error) {
 	messages := []Message{}
