@@ -62,6 +62,27 @@ div.center form div.pure-controls {
   margin-left: -70px !important;
 }
 
+ul#messages {
+  list-style: none;
+}
+
+ul#messages li.message {
+  background-color: #ccc;
+  padding: 15px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+ul#messages li.message div.date {
+  font-size: 0.8em;
+  color: #1d1d1d;
+  margin-bottom: 5px;
+}
+
+ul#messages li.message div.content {
+  color: #1d1d1d;
+}
+
 div#main {
   width: 60%;
 }
