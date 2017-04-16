@@ -5,7 +5,7 @@
 
 # Compiled binary
 main
-IVScoreboard
+DC416-CTF-Scoreboard
 
 # Database file
 scoreboard.db
