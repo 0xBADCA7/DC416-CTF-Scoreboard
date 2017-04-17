@@ -6,7 +6,7 @@ A scoreboard application for capture the flag events, designed with a retro hack
 ![Scoreboard Screenshot](https://u.nya.is/fpwpmj.png)
 
 **The Admin Panel**
-![Admin Panel Screenshot](https://u.nya.is/rdxsgs.png)
+![Admin Panel Screenshot](https://u.nya.is/vmzrfd.png)
 
 **The Messages Page**
 ![Messages Screenshot](https://u.nya.is/yxbyxc.png)
