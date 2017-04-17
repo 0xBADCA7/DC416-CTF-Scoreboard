@@ -77,6 +77,15 @@ select id, name, members, score, last_valid_submission
 from teams
 where token = ?;`
 
+	QFindTeam = `
+select name, token, members, score, last_valid_submission
+from teams
+where id = ?;`
+
+	QDeleteTeam = `
+delete from submitted where team_id = ?;
+delete from teams where id = ?;`
+
 	QUpdateTeam = `
 update teams
 set score = ?, token = ?, last_valid_submission = ?

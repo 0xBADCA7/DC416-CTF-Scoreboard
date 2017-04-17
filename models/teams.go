@@ -85,6 +85,12 @@ func (t *Team) Update(db *sql.DB) error {
 	return err
 }
 
+// Delete removes a team from the database.
+func (t *Team) Delete(db *sql.DB) error {
+	_, err := db.Exec(QDeleteTeam, t.Id, t.Id)
+	return err
+}
+
 // TeamScore contains information about a team's score.
 // It is safe to serve a TeamScore to users.
 type TeamScore struct {

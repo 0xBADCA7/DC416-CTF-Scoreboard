@@ -43,6 +43,7 @@ func main() {
 	http.HandleFunc("/logout", endpoints.Logout(db, &cfg))
 	http.HandleFunc("/admin", endpoints.Admin(db, &cfg))
 	http.HandleFunc("/message", endpoints.PostMessage(db, &cfg))
+	http.HandleFunc("/deleteteam", endpoints.DeleteTeam(db, &cfg))
 	fmt.Println("Listening on", cfg.BindAddress)
 	http.ListenAndServe(cfg.BindAddress, nil)
 }
