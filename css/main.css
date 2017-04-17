@@ -112,3 +112,7 @@ tr#teamsheader th {
   color: #f7f7f7;
   min-width: 20px;
 }
+
+a.delete-team-btn {
+  color: rgb(180, 27, 27);
+}

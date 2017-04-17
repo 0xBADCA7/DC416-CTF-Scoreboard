@@ -26,6 +26,7 @@
       <h1>Registered Teams</h1>
       <table id="teams">
         <tr id="teamsheader">
+          <th></th>
           <th>Team Name</th>
           <th>Submission Token</th>
           {{range .Flags}}
@@ -34,6 +35,9 @@
         </tr>
         {{range .Teams}}
         <tr>
+          <td>
+            <a class="delete-team-btn" data-id="{{.Id}}" data-name="{{.Name}}" href="#">Delete</a>
+          </td>
           <td>{{.Name}}</td>
           <td>{{.Token}}</td>
           {{range .Submitted}}
@@ -43,5 +47,33 @@
         {{end}}
       </table>
     </div>
+    <script>
+      const buttons = Array.from(document.getElementsByClassName('delete-team-btn'))
+      buttons.forEach((btn) => btn.addEventListener('click', deleteTeam))
+      
+      function deleteTeam (evt) {
+        const name = evt.target.attributes.getNamedItem('data-name').value
+        const id = Number(evt.target.attributes.getNamedItem('data-id').value)
+        if (!confirm(`Are you sure you want to delete the team "${name}"?`)) {
+          return
+        }
+        let request = new XMLHttpRequest()
+        request.onreadystatechange = () => {
+          if (request.readyState !== 4) {
+            return
+          }
+          const response = request.responseText === null
+            ? {error: 'Invalid response from server.'}
+            : JSON.parse(request.responseText)
+          if (response.error !== null) {
+            alert(`Error deleting team. Reason: ${response.error}`)
+          } else {
+            document.location = '/admin'
+          }
+        }
+        request.open('DELETE', `/deleteteam?id=${id}`, true)
+        request.send()
+      }
+    </script>
   </body>
 </html>

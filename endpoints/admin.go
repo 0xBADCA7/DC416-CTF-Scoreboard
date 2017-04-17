@@ -24,6 +24,7 @@ const flagNotFound = " "
 // a check mark symbol if the flag was found by the team in question or
 // else a space.
 type adminTeamInfo struct {
+	Id        int
 	Name      string
 	Token     string
 	Submitted []string
@@ -44,6 +45,7 @@ func loadTeamInfo(db *sql.DB, cfg *config.Config) ([]adminTeamInfo, error) {
 			return []adminTeamInfo{}, err
 		}
 		teamInfo = append(teamInfo, adminTeamInfo{
+			Id:        team.Id,
 			Name:      team.Name,
 			Token:     team.SubmitToken,
 			Submitted: []string{},
