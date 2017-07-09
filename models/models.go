@@ -36,6 +36,8 @@ const (
 		created_at timestamp
 	);`
 
+	QLastInsertedId = `select last_insert_rowid();`
+
 	QSaveMessage = `
 insert into messages (
 	content, created_at
@@ -48,7 +50,7 @@ select id, content, created_at
 from messages
 order by created_at desc;`
 
-	QDeleteAllMessages = `delete from messages;`
+	QDeleteAllMessages = `delete from messages where id = ?;`
 
 	QGetTeams = `
 select id, name, members, score, token, last_valid_submission

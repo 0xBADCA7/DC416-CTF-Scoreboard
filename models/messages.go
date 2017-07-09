@@ -12,6 +12,18 @@ type Message struct {
 	CreatedAt time.Time `json:"created"`
 }
 
+// MessageModel is implemented by types that can store and modify Messages.
+type MessageModel interface {
+	Save(Message) error
+	All() ([]Message, error)
+	Delete(Message) error
+}
+
+// MessageModelDB implements MessageModel to handle Messages in a sqlite database.
+type MessageModelDB struct {
+	db *sql.DB
+}
+
 // NewMessage constructs a new message with an invalid id until it's saved.
 func NewMessage(content string) Message {
 	return Message{
@@ -21,10 +33,15 @@ func NewMessage(content string) Message {
 	}
 }
 
-// AllMessages obtains all of the messages left by admins, ordered by most recently posted.
-func AllMessages(db *sql.DB) ([]Message, error) {
+// NewMessageModelDB constructs a new MessageModelDB with a database connection.
+func NewMessageModelDB(db *sql.DB) MessageModelDB {
+	return MessageModelDB{db}
+}
+
+// All obtains all of the messages left by admins, ordered by most recently posted.
+func (self *MessageModelDB) All() ([]Message, error) {
 	messages := []Message{}
-	rows, err := db.Query(QAllMessages)
+	rows, err := self.db.Query(QAllMessages)
 	if err != nil {
 		return messages, err
 	}
@@ -39,14 +56,18 @@ func AllMessages(db *sql.DB) ([]Message, error) {
 	return messages, nil
 }
 
-// DeleteAllMessages removes all messages left by admins from the database.
-func DeleteAllMessages(db *sql.DB) error {
-	_, err := db.Exec(QDeleteAllMessages)
+// Delete removes a message left by admins from the database.
+func (self *MessageModelDB) Delete(message Message) error {
+	_, err := db.Exec(QDeleteMessage, message.Id)
 	return err
 }
 
 // Save stores a new message to display to CTF participants.
-func (m *Message) Save(db *sql.DB) error {
-	_, err := db.Exec(QSaveMessage, m.Content, m.CreatedAt)
+func (self *MessageModelDB) Save(message Message) error {
+	_, err := self.db.Exec(QSaveMessage, message.Content, message.CreatedAt)
+	if err != nil {
+		return err
+	}
+	err = self.db.Exec(QLastInsertedId).Scan(&message.Id)
 	return err
 }
