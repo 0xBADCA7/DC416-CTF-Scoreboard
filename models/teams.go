@@ -107,7 +107,7 @@ func (self TeamModelDB) Save(team *Team) error {
 	if err != nil {
 		return err
 	}
-	err = self.db.QueryRow(QLastInsertedId).Scan(team.Id)
+	err = self.db.QueryRow(QLastInsertedId).Scan(&team.Id)
 	return err
 }
 

@@ -69,6 +69,6 @@ func (self *MessageModelDB) Save(message *Message) error {
 	if err != nil {
 		return err
 	}
-	err = self.db.QueryRow(QLastInsertedId).Scan(message.Id)
+	err = self.db.QueryRow(QLastInsertedId).Scan(&message.Id)
 	return err
 }

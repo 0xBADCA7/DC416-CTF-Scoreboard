@@ -80,6 +80,6 @@ func (self SubmissionModelDB) Save(submission *Submission) error {
 	if err != nil {
 		return err
 	}
-	err = self.db.QueryRow(QLastInsertedId).Scan(submission.Id)
+	err = self.db.QueryRow(QLastInsertedId).Scan(&submission.Id)
 	return err
 }
