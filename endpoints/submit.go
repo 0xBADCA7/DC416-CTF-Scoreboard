@@ -43,6 +43,7 @@ func submitPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.R
 // a flag. It prevents teams from entering the same flag multiple times and makes sure that the
 // submission token submitted is valid.
 func handleSubmission(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
+	submissionModel := models.NewSubmissionModelDB(db)
 	fmt.Println("Got a request to submit a flag")
 	w.Header().Set("Content-Type", "text/plain")
 	err := r.ParseForm()
@@ -86,7 +87,7 @@ func handleSubmission(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *
 		w.Write([]byte("The flag you submitted is invalid. Please check that it is formatted correctly."))
 		return
 	}
-	submission, err := models.FindSubmission(db, team.Id, flag.Id)
+	submission, err := submissionModel.Find(team.Id, flag.Id)
 	if err == nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("You cannot submit the same flag multiple times."))
@@ -94,7 +95,7 @@ func handleSubmission(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *
 	}
 	submission.Flag = flag.Id
 	submission.Owner = team.Id
-	err = submission.Save(db)
+	err = submissionModel.Save(&submission)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)

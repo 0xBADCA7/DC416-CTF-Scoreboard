@@ -32,6 +32,7 @@ type adminTeamInfo struct {
 
 // Load information about teams that we want to display on the admin page.
 func loadTeamInfo(db *sql.DB, cfg *config.Config) ([]adminTeamInfo, error) {
+	submissionModel := models.NewSubmissionModelDB(db)
 	teamInfo := []adminTeamInfo{}
 	teams, err := models.FindTeams(db)
 	if err != nil {
@@ -40,7 +41,7 @@ func loadTeamInfo(db *sql.DB, cfg *config.Config) ([]adminTeamInfo, error) {
 	index := 0
 	// Collect information about teams and the flags they've submitted.
 	for _, team := range teams {
-		submissions, err := models.FindAllSubmissions(db, team.Id)
+		submissions, err := submissionModel.All(team.Id)
 		if err != nil {
 			return []adminTeamInfo{}, err
 		}
