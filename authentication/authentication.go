@@ -18,10 +18,26 @@ const passwordEnvVar = "CTF_PASSWORD"
 // ErrExpiredToken is an error that indicates that a session token is expired.
 var ErrExpiredToken = errors.New("submitted token is expired")
 
-// CheckAuthorization determines whether a submitted session token is
-// valid and not expired.
-func CheckAuthorization(db *sql.DB, submittedToken string) error {
-	sessionModel := models.NewSessionModelDB(db)
+// AdminAuthenticator is implemented by types that can determine whether a submitted session
+// token belongs to a valid, authenticated administrator.
+type AdminAuthenticator interface {
+	Authenticate(string) error
+}
+
+// AdminAuthenticatorDB implements AdminAuthenticator in such a way that it does lookups
+// in a sqlite database's sessions table.
+type AdminAuthenticatorDB struct {
+	db *sql.DB
+}
+
+// NewAdminAuthenticatorDB constructs a new AdminAuthenticatorDB with a database connection.
+func NewAdminAuthenticatorDB(db *sql.DB) AdminAuthenticatorDB {
+	return AdminAuthenticatorDB{db}
+}
+
+// Authenticate determines whether a submitted session token is valid and not expired.
+func (self AdminAuthenticatorDB) Authenticate(submittedToken string) error {
+	sessionModel := models.NewSessionModelDB(self.db)
 	session, findErr := sessionModel.Find(submittedToken)
 	if findErr != nil {
 		return findErr
@@ -32,21 +48,19 @@ func CheckAuthorization(db *sql.DB, submittedToken string) error {
 	return nil
 }
 
-// CheckSessionToken looks for an appropriately named `session` cookie
-// in the provided request and then tests whether the session id
-// sent is valid.
+// CheckSessionToken looks for an appropriately named `session` cookie in the provided request and
+// then tests whether the session id sent is valid.
 func CheckSessionToken(r *http.Request, db *sql.DB) error {
+	auth := NewAdminAuthenticatorDB(db)
 	sessionCookie, err := r.Cookie(models.SessionCookieName)
 	if err != nil {
 		return err
 	}
-	return CheckAuthorization(db, sessionCookie.Value)
+	return auth.Authenticate(sessionCookie.Value)
 }
 
-// HashAdminPassword applies a secure scrypt-based password hash
-// to the value contained in the environment variable used to
-// supply an admin password.  If no password is provided, the
-// variable is left as the empty string.
+// HashAdminPassword applies a secure scrypt-based password hash to the value contained in the environment
+// variable used to supply an admin password.  If no password is provided, the variable is left as the empty string.
 func HashAdminPassword() {
 	adminPwd := getAdminPassword()
 	if len(adminPwd) > 0 {
@@ -59,17 +73,16 @@ func HashAdminPassword() {
 	}
 }
 
-// AdminLogin checks if a supplied password matches the one the
-// scoreboard is configured to restrict access to the admin page with.
+// AdminLogin checks if a supplied password matches the one the scoreboard is configured to restrict access to the
+// admin page with.
 func AdminLogin(db *sql.DB, password string) error {
 	expected := getAdminPassword()
 	return auth.CompareHashAndPassword([]byte(expected), []byte(password))
 }
 
-// getAdminPassword obtains the password required to access the
-// admin dashboard.  It should be hashed at the start of main using
-// the HashAdminPassword function.  An empty string indicates that
-// no password was set and all admin operations should be rejected.
+// getAdminPassword obtains the password required to access the admin dashboard.  It should be hashed at the start
+// of main using the HashAdminPassword function.  An empty string indicates that no password was set and all admin
+// operations should be rejected.
 func getAdminPassword() string {
 	return os.Getenv(passwordEnvVar)
 }
