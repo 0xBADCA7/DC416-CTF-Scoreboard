@@ -14,9 +14,9 @@ type Message struct {
 
 // MessageModel is implemented by types that can store and modify Messages.
 type MessageModel interface {
-	Save(Message) error
+	Save(*Message) error
 	All() ([]Message, error)
-	Delete(Message) error
+	Delete(*Message) error
 }
 
 // MessageModelDB implements MessageModel to handle Messages in a sqlite database.
@@ -57,17 +57,18 @@ func (self *MessageModelDB) All() ([]Message, error) {
 }
 
 // Delete removes a message left by admins from the database.
-func (self *MessageModelDB) Delete(message Message) error {
+func (self *MessageModelDB) Delete(message *Message) error {
 	_, err := self.db.Exec(QDeleteMessage, message.Id)
+	message.Id = -1
 	return err
 }
 
 // Save stores a new message to display to CTF participants.
-func (self *MessageModelDB) Save(message Message) error {
+func (self *MessageModelDB) Save(message *Message) error {
 	_, err := self.db.Exec(QSaveMessage, message.Content, message.CreatedAt)
 	if err != nil {
 		return err
 	}
-	err = self.db.QueryRow(QLastInsertedId).Scan(&message.Id)
+	err = self.db.QueryRow(QLastInsertedId).Scan(message.Id)
 	return err
 }

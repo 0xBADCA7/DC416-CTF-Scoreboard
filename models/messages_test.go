@@ -41,6 +41,9 @@ func TestMessageModelDB(test *testing.T) {
 		if err != nil {
 			test.Error(err)
 		}
+		if msg.Id < 0 {
+			test.Errorf("Expected ID of newly-created message to be updated after save. It was not")
+		}
 		messages = append(messages, msg)
 	}
 
@@ -56,6 +59,9 @@ func TestMessageModelDB(test *testing.T) {
 		err = messageModel.Delete(messages[i])
 		if err != nil {
 			test.Error(err)
+		}
+		if messages[i].Id > 0 {
+			test.Errorf("Expected ID of deleted message to be invalidated")
 		}
 	}
 
