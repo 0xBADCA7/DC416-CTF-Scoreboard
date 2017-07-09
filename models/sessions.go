@@ -21,16 +21,16 @@ type Session struct {
 	Expires time.Time `json:"expires"`
 }
 
-// FindSession attempts to lookup a session given its unique token.
-func FindSession(db *sql.DB, token string) (Session, error) {
-	session := Session{}
-	fmt.Println("Looking for session token", token)
-	err := db.QueryRow(QFindSessionToken, token).Scan(&session.Created, &session.Expires)
-	if err != nil {
-		return Session{}, err
-	}
-	session.Token = token
-	return session, err
+// SessionModel is implemented by types that can create and invalidate sessions.
+type SessionModel interface {
+	Find(string) (Session, error)
+	Save(*Session) error
+	Delete(*Session) error
+}
+
+// SessionModelDB implements SessionModel to handle Sessions in a sqlite database.
+type SessionModelDB struct {
+	db *sql.DB
 }
 
 // NewSession creates a new Session instance with a created time and expiration time, but
@@ -45,26 +45,44 @@ func NewSession() Session {
 	}
 }
 
+// NewSessionModelDB constructs a new instance of SessionModelDB with a database connection.
+func NewSessionModelDB(db *sql.DB) SessionModelDB {
+	return SessionModelDB{db}
+}
+
+// Find attempts to lookup a session given its unique token.
+func (self SessionModelDB) Find(token string) (Session, error) {
+	session := Session{}
+	fmt.Println("Looking for session token", token)
+	err := self.db.QueryRow(QFindSessionToken, token).Scan(&session.Created, &session.Expires)
+	if err != nil {
+		return Session{}, err
+	}
+	session.Token = token
+	return session, err
+}
+
 // Save attempts to save a session token, first generating the actual token value itself,
 // guaranteeing it is unique.
-func (s *Session) Save(db *sql.DB) error {
+func (self SessionModelDB) Save(session *Session) error {
 	uniqueToken := generateUniqueToken(func(token string) bool {
-		_, err := FindSession(db, token)
+		_, err := self.Find(token)
 		return err != nil
 	})
-	s.Token = uniqueToken
-	_, err := db.Exec(QCreateSession, s.Token, s.Created, s.Expires)
+	session.Token = uniqueToken
+	_, err := self.db.Exec(QCreateSession, session.Token, session.Created, session.Expires)
 	return err
 }
 
 // Delete removes a session token from the database.
-func (s *Session) Delete(db *sql.DB) error {
-	_, err := db.Exec(QDeleteSession, s.Token)
+func (self SessionModelDB) Delete(session *Session) error {
+	_, err := self.db.Exec(QDeleteSession, session.Token)
+	session.Token = ""
 	return err
 }
 
 // IsExpired determines if a session token is expired and should, consequently, be
 // rejected for administrative applicaions.
-func (s *Session) IsExpired() bool {
+func (s Session) IsExpired() bool {
 	return time.Now().After(s.Expires)
 }

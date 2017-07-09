@@ -29,6 +29,7 @@ func Login(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 // granting access to the admin dashboard if the credentials are correct.
 func adminLogin(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
+	sessionModel := models.NewSessionModelDB(db)
 	badPwdMsg := []byte("Incorrect password")
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -51,7 +52,7 @@ func adminLogin(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.R
 		return
 	}
 	session := models.NewSession()
-	saveErr := session.Save(db)
+	saveErr := sessionModel.Save(&session)
 	if saveErr != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Header().Set("Content-Type", "text/plain")

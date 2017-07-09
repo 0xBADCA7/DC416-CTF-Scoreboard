@@ -21,7 +21,8 @@ var ErrExpiredToken = errors.New("submitted token is expired")
 // CheckAuthorization determines whether a submitted session token is
 // valid and not expired.
 func CheckAuthorization(db *sql.DB, submittedToken string) error {
-	session, findErr := models.FindSession(db, submittedToken)
+	sessionModel := models.NewSessionModelDB(db)
+	session, findErr := sessionModel.Find(submittedToken)
 	if findErr != nil {
 		return findErr
 	}

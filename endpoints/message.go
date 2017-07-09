@@ -41,7 +41,7 @@ func saveMessage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.
 		return
 	}
 	message := models.NewMessage(msgs[0])
-	err = messageModel.Save(message)
+	err = messageModel.Save(&message)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Could not save message."))
