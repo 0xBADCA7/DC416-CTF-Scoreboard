@@ -33,8 +33,9 @@ type adminTeamInfo struct {
 // Load information about teams that we want to display on the admin page.
 func loadTeamInfo(db *sql.DB, cfg *config.Config) ([]adminTeamInfo, error) {
 	submissionModel := models.NewSubmissionModelDB(db)
+	teamModel := models.NewTeamModelDB(db)
 	teamInfo := []adminTeamInfo{}
-	teams, err := models.FindTeams(db)
+	teams, err := teamModel.All()
 	if err != nil {
 		return teamInfo, err
 	}

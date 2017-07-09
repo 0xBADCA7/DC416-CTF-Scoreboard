@@ -14,6 +14,7 @@ import (
 // DeleteTeam handles requests to delete a team issued by an admin.
 func DeleteTeam(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		teamModel := models.NewTeamModelDB(db)
 		w.Header().Set("Content-Type", "application/json")
 		authErr := authentication.CheckSessionToken(r, db)
 		if authErr != nil {
@@ -31,7 +32,7 @@ func DeleteTeam(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 			return
 		}
 		var team models.Team
-		teams, findErr := models.FindTeams(db)
+		teams, findErr := teamModel.All()
 		for _, t := range teams {
 			if t.Id == id {
 				team = t
@@ -42,7 +43,7 @@ func DeleteTeam(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 			jsonError(w, http.StatusBadRequest, "No team found.")
 			return
 		}
-		deleteErr := team.Delete(db)
+		deleteErr := teamModel.Delete(&team)
 		if deleteErr != nil {
 			jsonError(w, http.StatusInternalServerError, "Failed to delete team.")
 			return

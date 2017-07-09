@@ -19,6 +19,7 @@ import (
 // the teams and their scores.
 func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
+		teamModel := models.NewTeamModelDB(db)
 		funcs := template.FuncMap{
 			"increment": func(a int) string { return fmt.Sprintf("%d", a+1) },
 		}
@@ -38,7 +39,7 @@ func Index(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 			w.Write([]byte("We done goofed! Try again in a few minutes."))
 			return
 		}
-		teamInfo, err := models.FindTeams(db)
+		teamInfo, err := teamModel.All()
 		if err != nil {
 			fmt.Println("Error finding teams", err)
 			w.WriteHeader(http.StatusInternalServerError)

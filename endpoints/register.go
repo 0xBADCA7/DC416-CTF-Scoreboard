@@ -30,6 +30,7 @@ func Register(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 // registerNewTeam handles a POST request that contains new team data and creates a team
 // in the database.
 func registerNewTeam(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
+	teamModel := models.NewTeamModelDB(db)
 	team := models.Team{}
 	fmt.Println("Got a POST request to register a new team")
 	err := r.ParseForm()
@@ -54,7 +55,7 @@ func registerNewTeam(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *h
 	}
 	team.Name = names[0]
 	team.Members = members[0]
-	err = team.Save(db)
+	err = teamModel.Save(&team)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Could not create your team. Please make sure your name is not taken."))

@@ -44,6 +44,7 @@ func submitPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.R
 // submission token submitted is valid.
 func handleSubmission(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
 	submissionModel := models.NewSubmissionModelDB(db)
+	teamModel := models.NewTeamModelDB(db)
 	fmt.Println("Got a request to submit a flag")
 	w.Header().Set("Content-Type", "text/plain")
 	err := r.ParseForm()
@@ -67,7 +68,7 @@ func handleSubmission(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *
 		w.Write([]byte("Missing the flag field. Please supply secret flag."))
 		return
 	}
-	team, err := models.FindTeamByToken(db, tokens[0])
+	team, err := teamModel.Find(tokens[0])
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusBadRequest)
@@ -104,7 +105,7 @@ func handleSubmission(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *
 	}
 	team.Score += flag.Reward
 	team.LastSubmission = time.Now()
-	err = team.Update(db)
+	err = teamModel.Update(&team)
 	if err != nil {
 		fmt.Println(err)
 		w.WriteHeader(http.StatusInternalServerError)
