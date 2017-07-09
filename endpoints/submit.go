@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"../config"
-	"../models"
+	"github.com/DC416/DC416-CTF-Scoreboard/config"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
 // Submit handles POST requests to submit new flags and adjust team scores.

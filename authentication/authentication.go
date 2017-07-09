@@ -8,7 +8,7 @@ import (
 
 	auth "github.com/StratumSecurity/scryptauth"
 
-	"../models"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
 // passwordEnvVar is the name of the environment variable that we expect

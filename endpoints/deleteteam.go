@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strconv"
 
-	"../authentication"
-	"../config"
-	"../models"
+	"github.com/DC416/DC416-CTF-Scoreboard/authentication"
+	"github.com/DC416/DC416-CTF-Scoreboard/config"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
 // DeleteTeam handles requests to delete a team issued by an admin.

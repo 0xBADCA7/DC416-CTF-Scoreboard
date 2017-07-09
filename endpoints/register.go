@@ -8,9 +8,9 @@ import (
 	"path"
 	"strings"
 
-	"../authentication"
-	"../config"
-	"../models"
+	"github.com/DC416/DC416-CTF-Scoreboard/authentication"
+	"github.com/DC416/DC416-CTF-Scoreboard/config"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
 // Register presents a page which users can use to register.

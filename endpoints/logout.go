@@ -5,8 +5,8 @@ import (
 	"net/http"
 	"time"
 
-	"../config"
-	"../models"
+	"github.com/DC416/DC416-CTF-Scoreboard/config"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
 // Logout instructs the browser to delete the cookie containing the

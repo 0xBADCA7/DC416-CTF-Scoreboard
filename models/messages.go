@@ -58,7 +58,7 @@ func (self *MessageModelDB) All() ([]Message, error) {
 
 // Delete removes a message left by admins from the database.
 func (self *MessageModelDB) Delete(message Message) error {
-	_, err := db.Exec(QDeleteMessage, message.Id)
+	_, err := self.db.Exec(QDeleteMessage, message.Id)
 	return err
 }
 
@@ -68,6 +68,6 @@ func (self *MessageModelDB) Save(message Message) error {
 	if err != nil {
 		return err
 	}
-	err = self.db.Exec(QLastInsertedId).Scan(&message.Id)
+	err = self.db.QueryRow(QLastInsertedId).Scan(&message.Id)
 	return err
 }

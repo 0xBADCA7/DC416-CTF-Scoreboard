@@ -8,9 +8,9 @@ import (
 	"path"
 	"time"
 
-	"../authentication"
-	"../config"
-	"../models"
+	"github.com/DC416/DC416-CTF-Scoreboard/authentication"
+	"github.com/DC416/DC416-CTF-Scoreboard/config"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
 const adminURL = "/admin"

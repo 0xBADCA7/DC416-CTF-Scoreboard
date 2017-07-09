@@ -8,10 +8,10 @@ import (
 
 	_ "github.com/mattn/go-sqlite3"
 
-	"./authentication"
-	"./config"
-	"./endpoints"
-	"./models"
+	"github.com/DC416/DC416-CTF-Scoreboard/authentication"
+	"github.com/DC416/DC416-CTF-Scoreboard/config"
+	"github.com/DC416/DC416-CTF-Scoreboard/endpoints"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
 func main() {

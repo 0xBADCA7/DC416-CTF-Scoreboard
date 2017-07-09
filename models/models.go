@@ -50,7 +50,7 @@ select id, content, created_at
 from messages
 order by created_at desc;`
 
-	QDeleteAllMessages = `delete from messages where id = ?;`
+	QDeleteMessage = `delete from messages where id = ?;`
 
 	QGetTeams = `
 select id, name, members, score, token, last_valid_submission

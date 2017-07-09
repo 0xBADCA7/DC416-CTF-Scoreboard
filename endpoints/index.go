@@ -11,8 +11,8 @@ import (
 	"sort"
 	"time"
 
-	"../config"
-	"../models"
+	"github.com/DC416/DC416-CTF-Scoreboard/config"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
 // Index creates a request handler that serves index.html, the main scoreboard page with all of

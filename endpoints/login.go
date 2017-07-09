@@ -8,9 +8,9 @@ import (
 	"path"
 	"strings"
 
-	"../authentication"
-	"../config"
-	"../models"
+	"github.com/DC416/DC416-CTF-Scoreboard/authentication"
+	"github.com/DC416/DC416-CTF-Scoreboard/config"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
 // Login presents routes GET requests to serve a login page for admins and POST
