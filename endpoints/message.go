@@ -26,6 +26,7 @@ func PostMessage(db *sql.DB, cfg *config.Config) http.HandlerFunc {
 }
 
 func saveMessage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
+	messageModel := models.NewMessageModelDB(db)
 	err := r.ParseForm()
 	w.Header().Set("Content-Type", "text/plain")
 	if err != nil {
@@ -40,7 +41,7 @@ func saveMessage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.
 		return
 	}
 	message := models.NewMessage(msgs[0])
-	err = message.Save(db)
+	err = messageModel.Save(message)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Could not save message."))
@@ -50,6 +51,7 @@ func saveMessage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.
 }
 
 func messagesPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
+	messageModel := models.NewMessageModelDB(db)
 	t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "messages.html"))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -57,7 +59,7 @@ func messagesPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http
 		w.Write([]byte("Could not load messages."))
 		return
 	}
-	messages, findErr := models.AllMessages(db)
+	messages, findErr := messageModel.All()
 	if findErr != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Header().Set("Content-Type", "text/plain")
