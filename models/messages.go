@@ -39,7 +39,7 @@ func NewMessageModelDB(db *sql.DB) MessageModelDB {
 }
 
 // All obtains all of the messages left by admins, ordered by most recently posted.
-func (self *MessageModelDB) All() ([]Message, error) {
+func (self MessageModelDB) All() ([]Message, error) {
 	messages := []Message{}
 	rows, err := self.db.Query(QAllMessages)
 	if err != nil {
@@ -57,14 +57,14 @@ func (self *MessageModelDB) All() ([]Message, error) {
 }
 
 // Delete removes a message left by admins from the database.
-func (self *MessageModelDB) Delete(message *Message) error {
+func (self MessageModelDB) Delete(message *Message) error {
 	_, err := self.db.Exec(QDeleteMessage, message.Id)
 	message.Id = -1
 	return err
 }
 
 // Save stores a new message to display to CTF participants.
-func (self *MessageModelDB) Save(message *Message) error {
+func (self MessageModelDB) Save(message *Message) error {
 	_, err := self.db.Exec(QSaveMessage, message.Content, message.CreatedAt)
 	if err != nil {
 		return err
