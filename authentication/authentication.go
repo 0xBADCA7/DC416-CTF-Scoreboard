@@ -24,21 +24,20 @@ type AdminAuthenticator interface {
 	Authenticate(string) error
 }
 
-// AdminAuthenticatorDB implements AdminAuthenticator in such a way that it does lookups
+// AdminSessionAuthenticator implements AdminAuthenticator in such a way that it does lookups
 // in a sqlite database's sessions table.
-type AdminAuthenticatorDB struct {
-	db *sql.DB
+type AdminSessionAuthenticator struct {
+	sessions models.SessionModel
 }
 
-// NewAdminAuthenticatorDB constructs a new AdminAuthenticatorDB with a database connection.
-func NewAdminAuthenticatorDB(db *sql.DB) AdminAuthenticatorDB {
-	return AdminAuthenticatorDB{db}
+// NewAdminSessionAuthenticator constructs a new AdminSessionAuthenticatoB with a database connection.
+func NewAdminSessionAuthenticator(sessions models.SessionModel) AdminSessionAuthenticator {
+	return AdminSessionAuthenticator{sessions}
 }
 
 // Authenticate determines whether a submitted session token is valid and not expired.
-func (self AdminAuthenticatorDB) Authenticate(submittedToken string) error {
-	sessionModel := models.NewSessionModelDB(self.db)
-	session, findErr := sessionModel.Find(submittedToken)
+func (self AdminSessionAuthenticator) Authenticate(submittedToken string) error {
+	session, findErr := self.sessions.Find(submittedToken)
 	if findErr != nil {
 		return findErr
 	}
@@ -50,8 +49,8 @@ func (self AdminAuthenticatorDB) Authenticate(submittedToken string) error {
 
 // CheckSessionToken looks for an appropriately named `session` cookie in the provided request and
 // then tests whether the session id sent is valid.
-func CheckSessionToken(r *http.Request, db *sql.DB) error {
-	auth := NewAdminAuthenticatorDB(db)
+func CheckSessionToken(r *http.Request, sessions models.SessionModel) error {
+	auth := NewAdminSessionAuthenticator(sessions)
 	sessionCookie, err := r.Cookie(models.SessionCookieName)
 	if err != nil {
 		return err
