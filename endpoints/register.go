@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -13,24 +12,38 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
-// Register presents a page which users can use to register.
-func Register(db *sql.DB, cfg *config.Config) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		authErr := authentication.CheckSessionToken(r, db)
-		if authErr != nil {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-		} else if strings.ToUpper(r.Method) == "POST" {
-			registerNewTeam(db, cfg, w, r)
-		} else {
-			registerPage(db, cfg, w, r)
-		}
+// RegistrationHandler implements http.ServeHTTP to handle GET requests, which it responds to with
+// a page containing a registration form, and POST requests, which it handles by registering a new team.
+type RegistrationHandler struct {
+	cfg      config.Config
+	teams    models.TeamModel
+	sessions models.SessionModel
+}
+
+// NewRegistrationHandler construcs a new RegistrationHandler with a means of managing teams and sessions.
+func NewRegistrationHandler(cfg config.Config, teams models.TeamModel, sessions models.SessionModel) RegistrationHandler {
+	return RegistrationHandler{
+		cfg,
+		teams,
+		sessions,
+	}
+}
+
+// ServeHTTP handles requests to either view a registration form or upload a new team's info.
+func (self RegistrationHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	authErr := authentication.CheckSessionToken(req, self.sessions)
+	if authErr != nil {
+		http.Redirect(res, req, "/", http.StatusSeeOther)
+	} else if strings.ToUpper(req.Method) == "POST" {
+		registerNewTeam(&self.cfg, self.teams, res, req)
+	} else {
+		registerPage(&self.cfg, res, req)
 	}
 }
 
 // registerNewTeam handles a POST request that contains new team data and creates a team
 // in the database.
-func registerNewTeam(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
-	teamModel := models.NewTeamModelDB(db)
+func registerNewTeam(cfg *config.Config, teams models.TeamModel, w http.ResponseWriter, r *http.Request) {
 	team := models.Team{}
 	fmt.Println("Got a POST request to register a new team")
 	err := r.ParseForm()
@@ -55,7 +68,7 @@ func registerNewTeam(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *h
 	}
 	team.Name = names[0]
 	team.Members = members[0]
-	err = teamModel.Save(&team)
+	err = teams.Save(&team)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Could not create your team. Please make sure your name is not taken."))
@@ -70,7 +83,7 @@ Please make sure not to lose or share it with anyone not on your team.`,
 
 // registerPage serves the register.html page which contains a form that users can fill out
 // to register their team.
-func registerPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
+func registerPage(cfg *config.Config, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Got a request for the register page")
 	t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "register.html"))
 	if err != nil {
