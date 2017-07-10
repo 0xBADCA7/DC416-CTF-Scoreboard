@@ -40,6 +40,7 @@ func main() {
 	submissionHandler := endpoints.NewSubmissionHandler(cfg, submissions, teams)
 	registrationHandler := endpoints.NewRegistrationHandler(cfg, teams, sessions)
 	adminPageHandler := endpoints.NewAdminPageHandler(cfg, submissions, teams, sessions)
+	deleteTeamHandler := endpoints.NewDeleteTeamHandler(teams, sessions)
 
 	http.Handle("/css/", http.FileServer(http.Dir(".")))
 	http.Handle("/js/", http.FileServer(http.Dir(".")))
@@ -51,7 +52,7 @@ func main() {
 	http.HandleFunc("/logout", endpoints.Logout(db, &cfg))
 	http.Handle("/admin", adminPageHandler)
 	http.HandleFunc("/message", endpoints.PostMessage(db, &cfg))
-	http.HandleFunc("/deleteteam", endpoints.DeleteTeam(db, &cfg))
+	http.Handle("/deleteteam", deleteTeamHandler)
 	fmt.Println("Listening on", cfg.BindAddress)
 	http.ListenAndServe(cfg.BindAddress, nil)
 }
