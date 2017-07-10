@@ -1,8 +1,6 @@
 package endpoints
 
 import (
-	"database/sql"
-	"fmt"
 	"html/template"
 	"net/http"
 	"path"
@@ -13,20 +11,30 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
-// PostMessage handles requests to create new messages.
-func PostMessage(db *sql.DB, cfg *config.Config) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		authErr := authentication.CheckSessionToken(r, db)
-		if authErr == nil && strings.ToUpper(r.Method) == "POST" {
-			saveMessage(db, cfg, w, r)
-		} else {
-			messagesPage(db, cfg, w, r)
-		}
+type MessageHandler struct {
+	cfg      config.Config
+	messages models.MessageModel
+	sessions models.SessionModel
+}
+
+func NewMessageHandler(cfg config.Config, messages models.MessageModel, sessions models.SessionModel) MessageHandler {
+	return MessageHandler{
+		cfg,
+		messages,
+		sessions,
 	}
 }
 
-func saveMessage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
-	messageModel := models.NewMessageModelDB(db)
+func (self MessageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	authErr := authentication.CheckSessionToken(r, self.sessions)
+	if authErr == nil && strings.ToUpper(r.Method) == "POST" {
+		saveMessage(&self.cfg, self.messages, w, r)
+	} else {
+		messagesPage(&self.cfg, self.messages, w, r)
+	}
+}
+
+func saveMessage(cfg *config.Config, messages models.MessageModel, w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
 	w.Header().Set("Content-Type", "text/plain")
 	if err != nil {
@@ -41,7 +49,7 @@ func saveMessage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.
 		return
 	}
 	message := models.NewMessage(msgs[0])
-	err = messageModel.Save(&message)
+	err = messages.Save(&message)
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Write([]byte("Could not save message."))
@@ -50,8 +58,7 @@ func saveMessage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.
 	w.Write([]byte("Successfully saved new message."))
 }
 
-func messagesPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
-	messageModel := models.NewMessageModelDB(db)
+func messagesPage(cfg *config.Config, messages models.MessageModel, w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "messages.html"))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -59,16 +66,15 @@ func messagesPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http
 		w.Write([]byte("Could not load messages."))
 		return
 	}
-	messages, findErr := messageModel.All()
+	messageList, findErr := messages.All()
 	if findErr != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Header().Set("Content-Type", "text/plain")
 		w.Write([]byte("Could not load messages."))
 		return
 	}
-	fmt.Println("got messages ", messages)
 	data := struct {
 		Messages []models.Message
-	}{messages}
+	}{messageList}
 	t.Execute(w, data)
 }
