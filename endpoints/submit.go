@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -13,22 +12,34 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
-// Submit handles POST requests to submit new flags and adjust team scores.
-// Expects the following fields:
-// 1. token - The submission token assigned to your team
-// 2. flag  - The actual flag you are submitting
-func Submit(db *sql.DB, cfg *config.Config) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if strings.ToUpper(r.Method) == "POST" {
-			handleSubmission(db, cfg, w, r)
-		} else {
-			submitPage(db, cfg, w, r)
-		}
+// SubmissionHandler implements http.ServeHTTP to handle GET requests, which it responds to with a page listing
+// a submit form or POST requests, which it handles by checking a flag.
+type SubmissionHandler struct {
+	cfg         config.Config
+	submissions models.SubmissionModel
+	teams       models.TeamModel
+}
+
+// NewSubmissionHandler constructs a new submission handler with a means of managing submissions and teams..
+func NewSubmissionHandler(cfg config.Config, subs models.SubmissionModel, teams models.TeamModel) SubmissionHandler {
+	return SubmissionHandler{
+		cfg,
+		subs,
+		teams,
+	}
+}
+
+// ServeHTTP handles requests to either view a submission form or upload a new flag.
+func (self SubmissionHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	if strings.ToUpper(req.Method) == "POST" {
+		handleSubmission(&self.cfg, self.submissions, self.teams, res, req)
+	} else {
+		submitPage(&self.cfg, res, req)
 	}
 }
 
 // submitPage serves the HTML page allowing users to submit flags.
-func submitPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
+func submitPage(cfg *config.Config, w http.ResponseWriter, r *http.Request) {
 	t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "submit.html"))
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)
@@ -42,9 +53,7 @@ func submitPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.R
 // handleSubmission handles POST requests to /submit, issued by users when they are trying to submit
 // a flag. It prevents teams from entering the same flag multiple times and makes sure that the
 // submission token submitted is valid.
-func handleSubmission(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
-	submissionModel := models.NewSubmissionModelDB(db)
-	teamModel := models.NewTeamModelDB(db)
+func handleSubmission(cfg *config.Config, submissionModel models.SubmissionModel, teamModel models.TeamModel, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Got a request to submit a flag")
 	w.Header().Set("Content-Type", "text/plain")
 	err := r.ParseForm()

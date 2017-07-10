@@ -15,6 +15,8 @@ import (
 )
 
 func main() {
+	authentication.HashAdminPassword()
+
 	cfgFile := os.Getenv("CONFIG_FILE")
 	if cfgFile == "" {
 		cfgFile = "./config/config.json"
@@ -31,14 +33,17 @@ func main() {
 		panic(err)
 	}
 
-	authentication.HashAdminPassword()
+	submissions := models.NewSubmissionModelDB(db)
+	teams := models.NewTeamModelDB(db)
+
+	submissionHandler := endpoints.NewSubmissionHandler(cfg, submissions, teams)
 
 	http.Handle("/css/", http.FileServer(http.Dir(".")))
 	http.Handle("/js/", http.FileServer(http.Dir(".")))
 	http.Handle("/img/", http.FileServer(http.Dir(".")))
 	http.HandleFunc("/", endpoints.Index(db, &cfg))
 	http.HandleFunc("/register", endpoints.Register(db, &cfg))
-	http.HandleFunc("/submit", endpoints.Submit(db, &cfg))
+	http.Handle("/submit", submissionHandler)
 	http.HandleFunc("/login", endpoints.Login(db, &cfg))
 	http.HandleFunc("/logout", endpoints.Logout(db, &cfg))
 	http.HandleFunc("/admin", endpoints.Admin(db, &cfg))
