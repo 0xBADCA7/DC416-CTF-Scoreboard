@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -30,19 +29,75 @@ type adminTeamInfo struct {
 	Submitted []string
 }
 
+type AdminPageHandler struct {
+	cfg         config.Config
+	submissions models.SubmissionModel
+	teams       models.TeamModel
+	sessions    models.SessionModel
+}
+
+func NewAdminPageHandler(
+	cfg config.Config,
+	submissions models.SubmissionModel,
+	teams models.TeamModel,
+	sessions models.SessionModel) AdminPageHandler {
+	return AdminPageHandler{
+		cfg,
+		submissions,
+		teams,
+		sessions,
+	}
+}
+
+func (self AdminPageHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	authErr := authentication.CheckSessionToken(r, self.sessions)
+	if authErr != nil {
+		http.SetCookie(w, &http.Cookie{
+			Name:    models.SessionCookieName,
+			Value:   "",
+			Expires: time.Now(),
+		})
+		w.WriteHeader(http.StatusUnauthorized)
+		w.Header().Set("Content-Type", "text/plain")
+		w.Write([]byte("Access Denied"))
+		return
+	}
+	t, err := template.ParseFiles(path.Join(self.cfg.HTMLDir, "admin.html"))
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("content-Type", "text/plain")
+		w.Write([]byte("Could not load admin page"))
+		return
+	}
+	teams, err := loadTeamInfo(&self.cfg, self.teams, self.submissions)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Header().Set("content-Type", "text/plain")
+		fmt.Println("Error loading admin data on teams:", err.Error())
+		w.Write([]byte("Could not load admin data"))
+		return
+	}
+	data := struct {
+		Teams []adminTeamInfo
+		Flags []config.Flag
+	}{
+		teams,
+		self.cfg.Flags,
+	}
+	t.Execute(w, data)
+}
+
 // Load information about teams that we want to display on the admin page.
-func loadTeamInfo(db *sql.DB, cfg *config.Config) ([]adminTeamInfo, error) {
-	submissionModel := models.NewSubmissionModelDB(db)
-	teamModel := models.NewTeamModelDB(db)
+func loadTeamInfo(cfg *config.Config, teams models.TeamModel, submissions models.SubmissionModel) ([]adminTeamInfo, error) {
 	teamInfo := []adminTeamInfo{}
-	teams, err := teamModel.All()
+	teamList, err := teams.All()
 	if err != nil {
 		return teamInfo, err
 	}
 	index := 0
 	// Collect information about teams and the flags they've submitted.
-	for _, team := range teams {
-		submissions, err := submissionModel.All(team.Id)
+	for _, team := range teamList {
+		submissions, err := submissions.All(team.Id)
 		if err != nil {
 			return []adminTeamInfo{}, err
 		}
@@ -71,48 +126,4 @@ func loadTeamInfo(db *sql.DB, cfg *config.Config) ([]adminTeamInfo, error) {
 		index += 1
 	}
 	return teamInfo, nil
-}
-
-// Admin handles requests for /admin, redirecting to / if no session token
-// is received before testing whether the user has authenticated.
-// Authenticated users are served a page containing secret information
-// about teams.
-func Admin(db *sql.DB, cfg *config.Config) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		authErr := authentication.CheckSessionToken(r, db)
-		if authErr != nil {
-			http.SetCookie(w, &http.Cookie{
-				Name:    models.SessionCookieName,
-				Value:   "",
-				Expires: time.Now(),
-			})
-			w.WriteHeader(http.StatusUnauthorized)
-			w.Header().Set("Content-Type", "text/plain")
-			w.Write([]byte("Access Denied"))
-			return
-		}
-		t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "admin.html"))
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Header().Set("content-Type", "text/plain")
-			w.Write([]byte("Could not load admin page"))
-			return
-		}
-		teams, err := loadTeamInfo(db, cfg)
-		if err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Header().Set("content-Type", "text/plain")
-			fmt.Println("Error loading admin data on teams:", err.Error())
-			w.Write([]byte("Could not load admin data"))
-			return
-		}
-		data := struct {
-			Teams []adminTeamInfo
-			Flags []config.Flag
-		}{
-			teams,
-			cfg.Flags,
-		}
-		t.Execute(w, data)
-	}
 }

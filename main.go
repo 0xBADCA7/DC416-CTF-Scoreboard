@@ -33,20 +33,23 @@ func main() {
 		panic(err)
 	}
 
+	sessions := models.NewSessionModel(db)
 	submissions := models.NewSubmissionModelDB(db)
 	teams := models.NewTeamModelDB(db)
 
 	submissionHandler := endpoints.NewSubmissionHandler(cfg, submissions, teams)
+	registrationHandler := endpoints.NewRegistrationHandler(cfg, teams, sessions)
+	adminPageHandler := endpoints.NewAdminPageHandler(cfg, submissions, teams, sessions)
 
 	http.Handle("/css/", http.FileServer(http.Dir(".")))
 	http.Handle("/js/", http.FileServer(http.Dir(".")))
 	http.Handle("/img/", http.FileServer(http.Dir(".")))
 	http.HandleFunc("/", endpoints.Index(db, &cfg))
-	http.HandleFunc("/register", endpoints.Register(db, &cfg))
+	http.Handle("/register", registrationHandler)
 	http.Handle("/submit", submissionHandler)
 	http.HandleFunc("/login", endpoints.Login(db, &cfg))
 	http.HandleFunc("/logout", endpoints.Logout(db, &cfg))
-	http.HandleFunc("/admin", endpoints.Admin(db, &cfg))
+	http.Handle("/admin", adminPageHandler)
 	http.HandleFunc("/message", endpoints.PostMessage(db, &cfg))
 	http.HandleFunc("/deleteteam", endpoints.DeleteTeam(db, &cfg))
 	fmt.Println("Listening on", cfg.BindAddress)
