@@ -1,7 +1,6 @@
 package authentication
 
 import (
-	"database/sql"
 	"errors"
 	"net/http"
 	"os"
@@ -74,7 +73,7 @@ func HashAdminPassword() {
 
 // AdminLogin checks if a supplied password matches the one the scoreboard is configured to restrict access to the
 // admin page with.
-func AdminLogin(db *sql.DB, password string) error {
+func AdminLogin(password string) error {
 	expected := getAdminPassword()
 	return auth.CompareHashAndPassword([]byte(expected), []byte(password))
 }

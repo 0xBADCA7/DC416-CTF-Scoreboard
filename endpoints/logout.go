@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"database/sql"
 	"net/http"
 	"time"
 
@@ -14,7 +13,7 @@ type LogoutHandler struct {
 	sessions models.SessionModel
 }
 
-func NewLogoutHandler(cfg config.Config, sessions models.SessionModel) {
+func NewLogoutHandler(cfg config.Config, sessions models.SessionModel) LogoutHandler {
 	return LogoutHandler{
 		cfg,
 		sessions,

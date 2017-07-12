@@ -1,7 +1,6 @@
 package endpoints
 
 import (
-	"database/sql"
 	"fmt"
 	"html/template"
 	"net/http"
@@ -29,15 +28,14 @@ func (self LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if strings.ToUpper(r.Method) == "POST" {
 		adminLogin(&self.cfg, self.sessions, w, r)
 	} else {
-		loginPage(&self.cfg, self.sessions, w, r)
+		loginPage(&self.cfg, w, r)
 	}
 }
 
 // adminLogin checks the password provided to the application against a configured password,
 // granting access to the admin dashboard if the credentials are correct.
-func adminLogin(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
+func adminLogin(cfg *config.Config, sessions models.SessionModel, w http.ResponseWriter, r *http.Request) {
 	err := r.ParseForm()
-	sessionModel := models.NewSessionModelDB(db)
 	badPwdMsg := []byte("Incorrect password")
 	if err != nil {
 		w.WriteHeader(http.StatusUnauthorized)
@@ -52,7 +50,7 @@ func adminLogin(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.R
 		w.Write(badPwdMsg)
 		return
 	}
-	authErr := authentication.AdminLogin(db, password[0])
+	authErr := authentication.AdminLogin(password[0])
 	if authErr != nil {
 		w.WriteHeader(http.StatusUnauthorized)
 		w.Header().Set("Content-Type", "text/plain")
@@ -60,7 +58,7 @@ func adminLogin(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.R
 		return
 	}
 	session := models.NewSession()
-	saveErr := sessionModel.Save(&session)
+	saveErr := sessions.Save(&session)
 	if saveErr != nil {
 		w.WriteHeader(http.StatusInternalServerError)
 		w.Header().Set("Content-Type", "text/plain")
@@ -78,7 +76,7 @@ func adminLogin(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.R
 }
 
 // loginPage serves a page containing a login form for admins to access the admin dashboard.
-func loginPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
+func loginPage(cfg *config.Config, w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Got a request for the admin login page")
 	t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "login.html"))
 	if err != nil {
