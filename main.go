@@ -43,6 +43,7 @@ func main() {
 	adminPageHandler := endpoints.NewAdminPageHandler(cfg, submissions, teams, sessions)
 	deleteTeamHandler := endpoints.NewDeleteTeamHandler(teams, sessions)
 	messageHander := endpoints.NewMessageHandler(cfg, messages, sessions)
+	loginHandler := endpoints.NewLoginHandler(cfg, sessions)
 
 	http.Handle("/css/", http.FileServer(http.Dir(".")))
 	http.Handle("/js/", http.FileServer(http.Dir(".")))
@@ -50,7 +51,7 @@ func main() {
 	http.HandleFunc("/", endpoints.Index(db, &cfg))
 	http.Handle("/register", registrationHandler)
 	http.Handle("/submit", submissionHandler)
-	http.HandleFunc("/login", endpoints.Login(db, &cfg))
+	http.Handle("/login", loginHandler)
 	http.HandleFunc("/logout", endpoints.Logout(db, &cfg))
 	http.Handle("/admin", adminPageHandler)
 	http.Handle("/message", messageHander)

@@ -13,15 +13,23 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
-// Login presents routes GET requests to serve a login page for admins and POST
-// requests to handle a login form submission.
-func Login(db *sql.DB, cfg *config.Config) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if strings.ToUpper(r.Method) == "POST" {
-			adminLogin(db, cfg, w, r)
-		} else {
-			loginPage(db, cfg, w, r)
-		}
+type LoginHandler struct {
+	cfg      config.Config
+	sessions models.SessionModel
+}
+
+func NewLoginHandler(cfg config.Config, sessions models.SessionModel) LoginHandler {
+	return LoginHandler{
+		cfg,
+		sessions,
+	}
+}
+
+func (self LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if strings.ToUpper(r.Method) == "POST" {
+		adminLogin(&self.cfg, self.sessions, w, r)
+	} else {
+		loginPage(&self.cfg, self.sessions, w, r)
 	}
 }
 
