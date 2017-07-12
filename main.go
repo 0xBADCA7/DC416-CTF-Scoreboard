@@ -38,6 +38,7 @@ func main() {
 	sessions := models.NewSessionModelDB(db)
 	submissions := models.NewSubmissionModelDB(db)
 
+	indexHandler := endpoints.NewIndexHandler(cfg, teams)
 	submissionHandler := endpoints.NewSubmissionHandler(cfg, submissions, teams)
 	registrationHandler := endpoints.NewRegistrationHandler(cfg, teams, sessions)
 	adminPageHandler := endpoints.NewAdminPageHandler(cfg, submissions, teams, sessions)
@@ -49,7 +50,7 @@ func main() {
 	http.Handle("/css/", http.FileServer(http.Dir(".")))
 	http.Handle("/js/", http.FileServer(http.Dir(".")))
 	http.Handle("/img/", http.FileServer(http.Dir(".")))
-	http.HandleFunc("/", endpoints.Index(db, &cfg))
+	http.Handle("/", indexHandler)
 	http.Handle("/register", registrationHandler)
 	http.Handle("/submit", submissionHandler)
 	http.Handle("/login", loginHandler)
