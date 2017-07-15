@@ -13,14 +13,14 @@ func TestEventInfo(test *testing.T) {
 	defer server.Close()
 
 	// This endpoint will always serve JSON containing the event name
-	response, err := http.Get(server.URL())
+	response, err := http.Get(server.URL)
 	if err != nil {
 		test.Error(err)
 	}
 	if response.StatusCode != 200 {
 		test.Errorf("Expected the request to succeed. Got status code %d\n", response.StatusCode)
 	}
-	data := map[string]interface{}
+	data := map[string]interface{}{}
 	decoder := json.NewDecoder(response.Body)
 	defer response.Body.Close()
 	err = decoder.Decode(&data)
@@ -32,6 +32,6 @@ func TestEventInfo(test *testing.T) {
 		test.Errorf("Expected response to have a 'name' field, but it does not\n")
 	}
 	if name != "test event" {
-		test.Errorf("Expected the event name to be 'test event' but got '%s'\n", name) 
+		test.Errorf("Expected the event name to be 'test event' but got '%s'\n", name)
 	}
 }
