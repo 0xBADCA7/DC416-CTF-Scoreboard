@@ -54,7 +54,6 @@ None
 ```js
 {
     "name": string,
-    "minutesLeft": number
 }
 ```
 
