@@ -37,7 +37,7 @@ func TestMessageModelDB(test *testing.T) {
 	}
 	for _, testCase := range testCases {
 		msg := NewMessage(testCase.Message)
-		err := messageModel.Save(msg)
+		err := messageModel.Save(&msg)
 		if err != nil {
 			test.Error(err)
 		}
@@ -56,7 +56,7 @@ func TestMessageModelDB(test *testing.T) {
 		if len(found) != len(messages) {
 			test.Errorf("Expected %d messages. Got %d\n", len(messages), len(found))
 		}
-		err = messageModel.Delete(messages[i])
+		err = messageModel.Delete(&messages[i])
 		if err != nil {
 			test.Error(err)
 		}
@@ -68,7 +68,7 @@ func TestMessageModelDB(test *testing.T) {
 	// Expect database operations to fail after closing the database connection.
 	db.Close()
 	msg := NewMessage("should fail")
-	err = messageModel.Save(msg)
+	err = messageModel.Save(&msg)
 	if err == nil {
 		test.Errorf("Expected to get an error when saving after closing the database connection, but we did not")
 	}
@@ -76,7 +76,7 @@ func TestMessageModelDB(test *testing.T) {
 	if err == nil {
 		test.Errorf("Expected to get an error retrieving messages after closing the database connection, but we did not")
 	}
-	err = messageModel.Delete(msg)
+	err = messageModel.Delete(&msg)
 	if err == nil {
 		test.Errorf("Expected to get an error deleting after closing the database connection, but we did not")
 	}
