@@ -53,8 +53,8 @@ func TestMessageModelDB(test *testing.T) {
 		if err != nil {
 			test.Error(err)
 		}
-		if len(found) != len(messages) {
-			test.Errorf("Expected %d messages. Got %d\n", len(messages), len(found))
+		if len(found) != len(messages)-i {
+			test.Errorf("Expected %d messages. Got %d\n", len(messages)-i, len(found))
 		}
 		err = messageModel.Delete(&messages[i])
 		if err != nil {
