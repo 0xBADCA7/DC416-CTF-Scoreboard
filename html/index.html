@@ -10,7 +10,7 @@
       <a href="/login">Admin login</a> |
       <a href="/submit">Submit a flag</a> |
       <a href="/message">Messages</a>
-      <h1>{{.CTF}} Scoreboard</h1>
+      <h1 id="eventname">Loading...</h1>
       <table id="scoreboard">
         <tr id="scoreheader">
           <th>Place</th>
@@ -19,16 +19,45 @@
           <th>Members</th>
           <th>Last Submission</th>
         </tr>
-        {{range $i, $t := .Teams}}
-        <tr>
-          <td>{{increment $i}}</td>
-          <td>{{$t.Name}}</td>
-          <td>{{$t.Score}}</td>
-          <td>{{$t.Members}}</td>
-          <td>{{$t.Submitted}}</td>
-        </tr>
-        {{end}}
       </table>
     </div>
+    <script>
+(function () {
+    let xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+        document.getElementById('eventname').innerHTML = `${xhr.response.name} Scoreboard`;
+    };
+    xhr.open('GET', 'http://localhost:3000/event');
+    xhr.responseType = 'json';
+    xhr.send();
+
+    let xhr2 = new XMLHttpRequest();
+    xhr2.onload = function () {
+        let scoreboard = document.getElementById('scoreboard');
+        for (const team of xhr2.response.teams) {
+            let row = document.createElement('tr');
+            let position = document.createElement('td');
+            position.innerText = team.position;
+            let name = document.createElement('td');
+            name.innerText = team.name;
+            let score = document.createElement('td');
+            score.innerText = team.score;
+            let members = document.createElement('td');
+            members.innerText = team.members;
+            let submitted = document.createElement('td');
+            submitted.innerText = team.lastSubmission;
+            row.appendChild(position);
+            row.appendChild(name);
+            row.appendChild(score);
+            row.appendChild(members);
+            row.appendChild(submitted);
+            scoreboard.appendChild(row);
+        }
+    };
+    xhr2.open('GET', 'http://localhost:3000/teams/scoreboard');
+    xhr2.responseType = 'json';
+    xhr2.send();
+})();
+    </script>
   </body>
 </html>
