@@ -40,20 +40,20 @@ func NewInMemoryTeamModel(state teamState) mocks.TeamModelMock {
 	}
 
 	save := func(team *models.Team) error {
-		team.Id = len(state.Teams)
+		team.Id = len(state.Teams) + 1
 		state.Teams = append(state.Teams, *team)
 		return nil
 	}
 
 	update := func(team *models.Team) error {
-		state.Teams[team.Id] = *team
+		state.Teams[team.Id-1] = *team
 		return nil
 	}
 
 	del := func(team *models.Team) error {
-		state.Teams = append(state.Teams[:team.Id], state.Teams[team.Id+1:]...)
+		state.Teams = append(state.Teams[:team.Id-1], state.Teams[team.Id:]...)
 		// Wouldn't happen in a DB, but we will do it to make our mock simple.
-		for i := team.Id; i < len(state.Teams); i++ {
+		for i := team.Id - 1; i < len(state.Teams); i++ {
 			state.Teams[i].Id -= 1
 		}
 		return nil
