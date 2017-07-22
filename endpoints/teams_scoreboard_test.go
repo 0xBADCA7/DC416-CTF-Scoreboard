@@ -46,16 +46,26 @@ func NewInMemoryTeamModel(state teamState) mocks.TeamModelMock {
 	}
 
 	update := func(team *models.Team) error {
-		state.Teams[team.Id-1] = *team
-		return nil
+		for i := 0; i < len(state.Teams); i++ {
+			if state.Teams[i].Id == team.Id {
+				state.Teams[i] = *team
+				return nil
+			}
+		}
+		return errors.New("Team not found")
 	}
 
 	del := func(team *models.Team) error {
-		state.Teams = append(state.Teams[:team.Id-1], state.Teams[team.Id:]...)
-		// Wouldn't happen in a DB, but we will do it to make our mock simple.
-		for i := team.Id - 1; i < len(state.Teams); i++ {
-			state.Teams[i].Id -= 1
+		index := -1
+		for i := 0; i < len(state.Teams); i++ {
+			if state.Teams[i].Id == team.Id {
+				index = i
+			}
 		}
+		if index < 0 {
+			return errors.New("Team not found")
+		}
+		state.Teams = append(state.Teams[:index], state.Teams[index+1:]...)
 		return nil
 	}
 
