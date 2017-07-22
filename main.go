@@ -47,10 +47,15 @@ func main() {
 	loginHandler := endpoints.NewLoginHandler(cfg, sessions)
 	logoutHandler := endpoints.NewLogoutHandler(cfg, sessions)
 
+	eventInfoHandler := endpoints.NewEventInfoHandler(cfg.CTFName)
+	scoreboardHandler := endpoints.NewTeamsScoreboardHandler(teams)
+
 	http.Handle("/css/", http.FileServer(http.Dir(".")))
 	http.Handle("/js/", http.FileServer(http.Dir(".")))
 	http.Handle("/img/", http.FileServer(http.Dir(".")))
 	http.Handle("/", indexHandler)
+	http.Handle("/event", eventInfoHandler)
+	http.Handle("/teams/scoreboard", scoreboardHandler)
 	http.Handle("/register", registrationHandler)
 	http.Handle("/submit", submissionHandler)
 	http.Handle("/login", loginHandler)
