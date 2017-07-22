@@ -102,18 +102,19 @@ func TestScoreboardEndpoint(test *testing.T) {
 		}
 	}
 
-	// Produces a function that can be passed to testOutput that checks that the Nth team
-	// returned has the same fields as a given team.
-	compareNthTeam := func(index int, team models.Team) testFn {
+	// Produces a function that can be passed to testOutput that checks if a team is presnt
+	// in the response from the server.
+	tryFindTeam := func(team models.Team) testFn {
 		return func(data TeamScoreboardResponse) error {
-			teamFound := data.Teams[index]
-			teamIsExpected := teamFound.Name == team.Name &&
-				teamFound.Score == team.Score &&
-				teamFound.Members == team.Members
-			if !teamIsExpected {
-				return errors.New(fmt.Sprintf("Expected %v to equal %v\n", teamFound, team))
+			for _, teamFound := range data.Teams {
+				teamIsExpected := teamFound.Name == team.Name &&
+					teamFound.Score == team.Score &&
+					teamFound.Members == team.Members
+				if teamIsExpected {
+					return nil
+				}
 			}
-			return nil
+			return errors.New(fmt.Sprintf("Expected %v to be in response\n", team))
 		}
 	}
 
@@ -138,7 +139,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 	if err != nil {
 		test.Error(err)
 	}
-	err = testOutput(compareNthTeam(0, team))
+	err = testOutput(tryFindTeam(team))
 	if err != nil {
 		test.Error(err)
 	}
@@ -157,7 +158,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 	if err != nil {
 		test.Error(err)
 	}
-	err = testOutput(compareNthTeam(1, team2))
+	err = testOutput(tryFindTeam(team2))
 	if err != nil {
 		test.Error(err)
 	}
@@ -168,7 +169,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 	if err != nil {
 		test.Error(err)
 	}
-	err = testOutput(compareNthTeam(0, team2))
+	err = testOutput(tryFindTeam(team2))
 	if err != nil {
 		test.Error(err)
 	}
@@ -180,7 +181,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 	if err != nil {
 		test.Error(err)
 	}
-	err = testOutput(compareNthTeam(0, team2))
+	err = testOutput(tryFindTeam(team2))
 	if err != nil {
 		test.Error(err)
 	}
