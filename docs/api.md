@@ -73,6 +73,7 @@ None
 
 ```js
 {
+    "error": string | null,
     "teams": [
         {
             "name": string,
