@@ -99,7 +99,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 				return errors.New("Expected response to have a 'teams' field.")
 			}
 			numTeams := len(teams.([]interface{}))
-			if numTeams != 0 {
+			if numTeams != expectedLen {
 				return errors.New(fmt.Sprintf("Expected 0 teams. Found %d\n", numTeams))
 			}
 			return nil
@@ -111,8 +111,11 @@ func TestScoreboardEndpoint(test *testing.T) {
 	compareNthTeam := func(index int, team models.Team) testFn {
 		return func(data map[string]interface{}) error {
 			teams := data["teams"]
-			teamFound := teams.([]models.Team)[index]
-			if teamFound != team {
+			teamFound := teams.([]SBTeamInfo)[index]
+			teamIsExpected := teamFound.Name == team.Name &&
+				teamFound.Score == team.Score &&
+				teamFound.Members == team.Members
+			if !teamIsExpected {
 				return errors.New(fmt.Sprintf("Expected %v to equal %v\n", teamFound, team))
 			}
 			return nil
