@@ -5,25 +5,25 @@ import (
 )
 
 // TeamFindFn is the type of a function that effectively satisfies TeamModel.Find
-type TeamFindFn(token string) (models.Team, error)
+type TeamFindFn func(token string) (models.Team, error)
 
 // TeamAllFn is the type of a function that effectively satisfies TeamModel.All
-type TeamAllFn() ([]models.Team, error)
+type TeamAllFn func() ([]models.Team, error)
 
 // TeamSaveFn is the type of a function that effectively satisfies TeamModel.Save
-type TeamSaveFn(*models.Team) error
+type TeamSaveFn func(*models.Team) error
 
 // TeamUpdateFn is the type of a function that effectively satisfies TeamModel.Update
-type TeamUpdateFn(*models.Team) error
+type TeamUpdateFn func(*models.Team) error
 
 // TeamDeleteFn is the type of a function that effectively satisfies TeamModel.Delete
-type TeamDeleteFn(*models.Team) error
+type TeamDeleteFn func(*models.Team) error
 
 // TeamModelMock implements models.TeamModel in a way that lets us supply custom implementations of each method.
 type TeamModelMock struct {
-	find TeamFindFn
-	all TeamAllFn
-	save TeamSaveFn
+	find   TeamFindFn
+	all    TeamAllFn
+	save   TeamSaveFn
 	update TeamUpdateFn
 	delete TeamDeleteFn
 }
