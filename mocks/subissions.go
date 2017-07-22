@@ -5,7 +5,7 @@ import (
 )
 
 // SubmissionFindFn is the type of a function that effectively satisfies SubmissionModel.Save
-type SubmissionFindFn func(int, int) (Submission, error)
+type SubmissionFindFn func(int, int) (models.Submission, error)
 
 // SubmissionAllFn is the type of a function that effectively satisfies SubmissionModel.All
 type SubmissionAllFn func() ([]models.Submission, error)
@@ -15,7 +15,7 @@ type SubmissionSaveFn func(*models.Submission) error
 
 // SubmissionModelMock implements models.SubmissionModel in a way that lets us supply custom implementations of each method.
 type SubmissionModelMock struct {
-	save SubmissionFindFn
+	find SubmissionFindFn
 	all  SubmissionAllFn
 	save SubmissionSaveFn
 }
@@ -29,7 +29,7 @@ func NewSubmissionModelMock(find SubmissionFindFn, all SubmissionAllFn, save Sub
 	}
 }
 
-func (self SubmissionModelMock) Find(teamId, flagId int) (Submission, error) {
+func (self SubmissionModelMock) Find(teamId, flagId int) (models.Submission, error) {
 	return self.find(teamId, flagId)
 }
 
