@@ -60,6 +60,7 @@ func NewInMemoryTeamModel(state teamState) mocks.TeamModelMock {
 		for i := 0; i < len(state.Teams); i++ {
 			if state.Teams[i].Id == team.Id {
 				index = i
+				break
 			}
 		}
 		if index < 0 {
