@@ -13,69 +13,8 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
-// Closed over by the TeamModelMock created by NewInMemoryTeamModel.
-type teamState struct {
-	Teams []models.Team
-}
-
-// Constructs a TeamModelMock that operates on an in-memory array of teams
-// instead of talking to a database.
-//
-// Note that this mock has the quirk that, after a team with an id N gets
-// deleted, all teams with ids m >= n will be decremented to id = m - 1.
-func NewInMemoryTeamModel(state teamState) mocks.TeamModelMock {
-
-	find := func(token string) (models.Team, error) {
-		for _, team := range state.Teams {
-			if team.SubmitToken == token {
-				return team, nil
-			}
-		}
-		team := models.Team{}
-		return team, errors.New("Team not found")
-	}
-
-	all := func() ([]models.Team, error) {
-		return state.Teams, nil
-	}
-
-	save := func(team *models.Team) error {
-		team.Id = len(state.Teams) + 1
-		state.Teams = append(state.Teams, *team)
-		return nil
-	}
-
-	update := func(team *models.Team) error {
-		for i := 0; i < len(state.Teams); i++ {
-			if state.Teams[i].Id == team.Id {
-				state.Teams[i] = *team
-				return nil
-			}
-		}
-		return errors.New("Team not found")
-	}
-
-	del := func(team *models.Team) error {
-		index := -1
-		for i := 0; i < len(state.Teams); i++ {
-			if state.Teams[i].Id == team.Id {
-				index = i
-				break
-			}
-		}
-		if index < 0 {
-			return errors.New("Team not found")
-		}
-		state.Teams = append(state.Teams[:index], state.Teams[index+1:]...)
-		return nil
-	}
-
-	return mocks.NewTeamModelMock(find, all, save, update, del)
-}
-
 func TestScoreboardEndpoint(test *testing.T) {
-	state := teamState{make([]models.Team, 0)}
-	teamsModel := NewInMemoryTeamModel(state)
+	teamsModel := mocks.NewInMemoryTeamModel()
 	handler := NewTeamsScoreboardHandler(teamsModel)
 	server := httptest.NewServer(handler)
 	defer server.Close()
