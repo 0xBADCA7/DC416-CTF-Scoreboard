@@ -1,13 +1,13 @@
 package endpoints
 
 import (
-	"database/sql"
 	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
 	"github.com/DC416/DC416-CTF-Scoreboard/mocks"
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
@@ -27,7 +27,7 @@ func NewInMemoryTeamModel(state teamState) mocks.TeamModelMock {
 
 	find := func(token string) (models.Team, error) {
 		for _, team := range state.Teams {
-			if team.Token == token {
+			if team.SubmitToken == token {
 				return team, nil
 			}
 		}
@@ -120,7 +120,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 	}
 
 	// Check that we start with no teams
-	err = testOutput(testLenTeams(0))
+	err := testOutput(testLenTeams(0))
 	if err != nil {
 		test.Error(err)
 	}
@@ -133,14 +133,14 @@ func TestScoreboardEndpoint(test *testing.T) {
 		Members:        "",
 		Score:          0,
 		SubmitToken:    "testtoken",
-		LastSubmission: "never",
+		LastSubmission: time.Now(),
 	}
 	teamsModel.Save(&team)
 	err = testOutput(testLenTeams(1))
 	if err != nil {
 		test.Error(err)
 	}
-	err = testOutput(compareNth(1, team))
+	err = testOutput(compareNthTeam(1, team))
 	if err != nil {
 		test.Error(err)
 	}
@@ -152,14 +152,14 @@ func TestScoreboardEndpoint(test *testing.T) {
 		Members:        "",
 		Score:          30,
 		SubmitToken:    "testtoken2",
-		LastSubmission: "5 minutes ago",
+		LastSubmission: time.Now(),
 	}
 	teamsModel.Save(&team2)
 	err = testOutput(testLenTeams(2))
 	if err != nil {
 		test.Error(err)
 	}
-	err = testOutput(compareNth(2, team2))
+	err = testOutput(compareNthTeam(2, team2))
 	if err != nil {
 		test.Error(err)
 	}
@@ -170,7 +170,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 	if err != nil {
 		test.Error(err)
 	}
-	err = testOutput(compareNth(1, team2))
+	err = testOutput(compareNthTeam(1, team2))
 	if err != nil {
 		test.Error(err)
 	}
@@ -182,7 +182,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 	if err != nil {
 		test.Error(err)
 	}
-	err = testOutput(compareNth(1, team2))
+	err = testOutput(compareNthTeam(1, team2))
 	if err != nil {
 		test.Error(err)
 	}
