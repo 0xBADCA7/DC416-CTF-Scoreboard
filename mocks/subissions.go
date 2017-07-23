@@ -1,6 +1,8 @@
 package mocks
 
 import (
+	"errors"
+
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
@@ -65,11 +67,11 @@ func NewInMemorySubmissionModel() SubmissionModelMock {
 		return state.Submissions, nil
 	}
 
-	save := func(submision *Submission) erro {
+	save := func(submission *models.Submission) error {
 		submission.Id = len(state.Submissions) + 1
 		state.Submissions = append(state.Submissions, *submission)
 		return nil
 	}
 
-	return NewSubmissionModelMock(find, all save)
+	return NewSubmissionModelMock(find, all, save)
 }
