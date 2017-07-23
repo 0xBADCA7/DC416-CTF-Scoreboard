@@ -20,6 +20,11 @@ type SubmissionModelMock struct {
 	save SubmissionSaveFn
 }
 
+// Closed over by the SubmissionModelMock created by NewInMemorySubmissionModel.
+type submissionState struct {
+	Submissions []models.Submission
+}
+
 // NewSubmissionModelMock constructs a new mock implementation of models.SubmissionModel with caller-defined functions.
 func NewSubmissionModelMock(find SubmissionFindFn, all SubmissionAllFn, save SubmissionSaveFn) SubmissionModelMock {
 	return SubmissionModelMock{
@@ -39,4 +44,32 @@ func (self SubmissionModelMock) All() ([]models.Submission, error) {
 
 func (self SubmissionModelMock) Save(submission *models.Submission) error {
 	return self.save(submission)
+}
+
+// Constructs a SubmissionModelMock that operates on an in-memory array of submissions
+// instead of talking to a database.
+func NewInMemorySubmissionModel() SubmissionModelMock {
+	state := submissionState{make([]models.Submission, 0)}
+
+	find := func(teamId, flagId int) (models.Submission, error) {
+		for _, sub := range state.Submissions {
+			if sub.Owner == teamId && sub.Flag == flagId {
+				return sub, nil
+			}
+		}
+		sub := models.Submission{}
+		return sub, errors.New("Submission not found")
+	}
+
+	all := func() ([]models.Submission, error) {
+		return state.Submissions, nil
+	}
+
+	save := func(submision *Submission) erro {
+		submission.Id = len(state.Submissions) + 1
+		state.Submissions = append(state.Submissions, *submission)
+		return nil
+	}
+
+	return NewSubmissionModelMock(find, all save)
 }
