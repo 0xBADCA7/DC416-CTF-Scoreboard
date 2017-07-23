@@ -73,9 +73,6 @@ func (self TeamModelMock) Delete(team *models.Team) error {
 
 // Constructs a TeamModelMock that operates on an in-memory array of teams
 // instead of talking to a database.
-//
-// Note that this mock has the quirk that, after a team with an id N gets
-// deleted, all teams with ids m >= n will be decremented to id = m - 1.
 func NewInMemoryTeamModel() TeamModelMock {
 	state := teamState{make([]models.Team, 0)}
 
