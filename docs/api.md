@@ -39,7 +39,7 @@ described as a JSON object. Just replace the JSON keys with query string paramet
 
 ## Event Endpoints
 
-### Information about hte event
+### Information about the event
 
     GET /event
 
@@ -57,7 +57,7 @@ None
 }
 ```
 
-## Team Endpoitns
+## Team Endpoints
 
 ### List of teams and their scores
 
@@ -83,5 +83,31 @@ None
             "lastSubmission": string
         }
     ]
+}
+```
+### Submit a flag
+
+    POST /teams/submit
+
+Submit a flag.
+
+#### Parameters
+
+```json
+{
+    "token": string,
+    "flag": string
+}
+```
+
+Here, `token` is the team's secret submission token, sent to them by an administrator of the event.
+
+#### Response
+
+```json
+{
+    "error": string | null,
+    "valid": boolean,
+    "newScore": number
 }
 ```
