@@ -107,7 +107,7 @@ Here, `token` is the team's secret submission token, sent to them by an administ
 ```json
 {
     "error": string | null,
-    "valid": boolean,
+    "correct": boolean,
     "newScore": number
 }
 ```
