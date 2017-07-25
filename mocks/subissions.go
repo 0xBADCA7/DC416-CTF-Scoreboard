@@ -10,7 +10,7 @@ import (
 type SubmissionFindFn func(int, int) (models.Submission, error)
 
 // SubmissionAllFn is the type of a function that effectively satisfies SubmissionModel.All
-type SubmissionAllFn func() ([]models.Submission, error)
+type SubmissionAllFn func(int) ([]models.Submission, error)
 
 // SubmissionSaveFn is the type of a function that effectively satisfies SubmissionModel.Save
 type SubmissionSaveFn func(*models.Submission) error
@@ -40,8 +40,8 @@ func (self SubmissionModelMock) Find(teamId, flagId int) (models.Submission, err
 	return self.find(teamId, flagId)
 }
 
-func (self SubmissionModelMock) All() ([]models.Submission, error) {
-	return self.all()
+func (self SubmissionModelMock) All(teamId int) ([]models.Submission, error) {
+	return self.all(teamId)
 }
 
 func (self SubmissionModelMock) Save(submission *models.Submission) error {
@@ -63,8 +63,14 @@ func NewInMemorySubmissionModel() SubmissionModelMock {
 		return sub, errors.New("Submission not found")
 	}
 
-	all := func() ([]models.Submission, error) {
-		return state.Submissions, nil
+	all := func(teamId int) ([]models.Submission, error) {
+		submissions := []models.Submission{}
+		for _, submission := range state.Submissions {
+			if submission.Owner == teamId {
+				submissions = append(submissions, submission)
+			}
+		}
+		return submissions, nil
 	}
 
 	save := func(submission *models.Submission) error {
