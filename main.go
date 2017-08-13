@@ -54,9 +54,9 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.Handle("/css/", http.FileServer(http.Dir(".")))
-	router.Handle("/js/", http.FileServer(http.Dir(".")))
-	router.Handle("/img/", http.FileServer(http.Dir(".")))
+	http.Handle("/css/", http.FileServer(http.Dir(".")))
+	// http.Handle("/js/", http.FileServer(http.Dir(".")))
+	http.Handle("/img/", http.FileServer(http.Dir(".")))
 	router.Handle("/", indexHandler)
 	router.Handle("/event", eventInfoHandler)
 	router.Handle("/teams/scoreboard", scoreboardHandler)
