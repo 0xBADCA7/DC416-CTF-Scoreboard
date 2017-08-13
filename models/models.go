@@ -21,6 +21,7 @@ const (
 		id integer primary key,
 		team_id integer,
 		flag_id integer,
+		unique(team_id, flag_id) on conflict fail,
 		foreign key(team_id) references teams(id)
 	);`
 
