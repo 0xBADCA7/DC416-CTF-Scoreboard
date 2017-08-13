@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/DC416/DC416-CTF-Scoreboard/config"
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
@@ -99,6 +100,7 @@ func (self TeamSubmitHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		return
 	}
 	team.Score += flag.Reward
+	team.LastSubmission = time.Now()
 	updateErr := self.teams.Update(&team)
 	if updateErr != nil {
 		res.WriteHeader(http.StatusInternalServerError)
