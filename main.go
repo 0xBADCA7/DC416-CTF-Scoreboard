@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
 
 	"github.com/DC416/DC416-CTF-Scoreboard/authentication"
@@ -39,7 +40,6 @@ func main() {
 	submissions := models.NewSubmissionModelDB(db)
 
 	indexHandler := endpoints.NewIndexHandler(cfg, teams)
-	submissionHandler := endpoints.NewSubmissionHandler(cfg, submissions, teams)
 	registrationHandler := endpoints.NewRegistrationHandler(cfg, teams, sessions)
 	adminPageHandler := endpoints.NewAdminPageHandler(cfg, submissions, teams, sessions)
 	deleteTeamHandler := endpoints.NewDeleteTeamHandler(teams, sessions)
@@ -49,20 +49,25 @@ func main() {
 
 	eventInfoHandler := endpoints.NewEventInfoHandler(cfg.CTFName)
 	scoreboardHandler := endpoints.NewTeamsScoreboardHandler(teams)
+	submissionHandler := endpoints.NewTeamSubmitHandler(teams, submissions, cfg.Flags)
 
-	http.Handle("/css/", http.FileServer(http.Dir(".")))
-	http.Handle("/js/", http.FileServer(http.Dir(".")))
-	http.Handle("/img/", http.FileServer(http.Dir(".")))
-	http.Handle("/", indexHandler)
-	http.Handle("/event", eventInfoHandler)
-	http.Handle("/teams/scoreboard", scoreboardHandler)
-	http.Handle("/register", registrationHandler)
-	http.Handle("/submit", submissionHandler)
-	http.Handle("/login", loginHandler)
-	http.Handle("/logout", logoutHandler)
-	http.Handle("/admin", adminPageHandler)
-	http.Handle("/message", messageHander)
-	http.Handle("/deleteteam", deleteTeamHandler)
+	router := mux.NewRouter()
+
+	router.Handle("/css/", http.FileServer(http.Dir(".")))
+	router.Handle("/js/", http.FileServer(http.Dir(".")))
+	router.Handle("/img/", http.FileServer(http.Dir(".")))
+	router.Handle("/", indexHandler)
+	router.Handle("/event", eventInfoHandler)
+	router.Handle("/teams/scoreboard", scoreboardHandler)
+	router.Handle("/register", registrationHandler)
+	router.Handle("/submit", submissionHandler).Methods("POST")
+	router.Handle("/login", loginHandler)
+	router.Handle("/logout", logoutHandler)
+	router.Handle("/admin", adminPageHandler)
+	router.Handle("/message", messageHander)
+	router.Handle("/deleteteam", deleteTeamHandler)
+
+	http.Handle("/", router)
 	fmt.Println("Listening on", cfg.BindAddress)
 	http.ListenAndServe(cfg.BindAddress, nil)
 }
