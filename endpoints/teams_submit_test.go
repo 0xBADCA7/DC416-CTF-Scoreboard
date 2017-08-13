@@ -55,13 +55,14 @@ func TestSubmitEndpoint(test *testing.T) {
 	}{
 		{200, 1, 1, "team1token", "flag{secret1}", false, true, 10},
 		{200, 2, 1, "team1token", "flag{h3ll0w0rld}", false, true, 60},
-		{200, 3, 2, "team2token", "flag{secret1}", false, true, 10},
-		{400, 3, 2, "team2token", "flag{h3ll0world}", false, false, 10},
-		{403, 3, 0, "team2t0k3n", "flag{hell0w0rld}", true, false, 0},
-		{400, 3, 1, "team1token", "flag{secret1}", true, true, 60},
+		{200, 1, 2, "team2token", "flag{secret1}", false, true, 10},
+		{400, 1, 2, "team2token", "flag{h3ll0world}", true, false, 10},
+		{403, 0, 0, "team2t0k3n", "flag{hell0w0rld}", true, false, 0},
+		{400, 2, 1, "team1token", "flag{secret1}", true, true, 60},
 	}
 
-	for _, testCase := range testCases {
+	for i, testCase := range testCases {
+		test.Logf("Running test case #%d\n", i)
 		reqData := TeamSubmitRequest{
 			Token: testCase.SubmitToken,
 			Flag:  testCase.FlagToSubmit,
@@ -81,9 +82,12 @@ func TestSubmitEndpoint(test *testing.T) {
 		if err != nil {
 			test.Error(err)
 		}
-		gotError := data.Error != nil
-		if gotError != testCase.ExpectError {
-			test.Errorf("Expected error? %v. Got error: '%v'\n", testCase.ExpectError, *data.Error)
+		gotErr := data.Error != nil
+		if gotErr && !testCase.ExpectError {
+			test.Errorf("Got unexpected error: '%v'\n", *data.Error)
+		}
+		if !gotErr && testCase.ExpectError {
+			test.Errorf("Did not get error where it was expected")
 		}
 		if data.IsCorrect != testCase.ExpectFlagValid {
 			test.Errorf("Expected flag to be valid? %v. Was valid? %v.", testCase.ExpectFlagValid, data.IsCorrect)

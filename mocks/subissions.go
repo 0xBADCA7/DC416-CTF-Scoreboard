@@ -74,6 +74,11 @@ func NewInMemorySubmissionModel() SubmissionModelMock {
 	}
 
 	save := func(submission *models.Submission) error {
+		for _, sub := range state.Submissions {
+			if sub.Flag == submission.Flag && sub.Owner == submission.Owner {
+				return errors.New("Duplicate flag submitted")
+			}
+		}
 		submission.Id = len(state.Submissions) + 1
 		state.Submissions = append(state.Submissions, *submission)
 		return nil
