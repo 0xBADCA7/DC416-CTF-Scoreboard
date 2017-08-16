@@ -111,3 +111,29 @@ Here, `token` is the team's secret submission token, sent to them by an administ
     "newScore": number
 }
 ```
+
+### Login to the admin console
+
+    POST /admin
+
+Log into the admin console in order to be able to create and delete teams, as well as view each
+team's submitted flags and submission token.
+
+#### Parameters
+
+```json
+{
+    "password": string
+}
+```
+#### Response
+
+```json
+{
+    "error": string | null,
+    "session": string,
+    "redirect": string
+}
+```
+
+Upon successful login, `redirect` will contain a URL to the admin page.
