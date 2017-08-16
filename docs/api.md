@@ -137,3 +137,26 @@ team's submitted flags and submission token.
 ```
 
 Upon successful login, `redirect` will contain a URL to the admin page.
+
+### Get messages from the administrators
+
+    GET /messages
+
+Obtain a list of messages written by the CTF's administrators for the participants.
+
+#### Parameters
+
+None
+
+#### Response
+
+```json
+{
+    "messages": [
+        {
+            "written": date,
+            "message": string
+        }
+    ]
+}
+```
