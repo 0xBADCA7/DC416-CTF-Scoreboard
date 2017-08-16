@@ -43,7 +43,6 @@ func main() {
 	adminPageHandler := endpoints.NewAdminPageHandler(cfg, submissions, teams, sessions)
 	deleteTeamHandler := endpoints.NewDeleteTeamHandler(teams, sessions)
 	messageHander := endpoints.NewMessageHandler(cfg, messages, sessions)
-	loginHandler := endpoints.NewLoginHandler(cfg, sessions)
 	logoutHandler := endpoints.NewLogoutHandler(cfg, sessions)
 
 	indexHandler := endpoints.NewIndexHandler(cfg, teams)
@@ -51,6 +50,8 @@ func main() {
 	scoreboardHandler := endpoints.NewTeamsScoreboardHandler(teams)
 	submitPageHandler := endpoints.NewSubmitPageHandler(cfg)
 	submissionHandler := endpoints.NewTeamSubmitHandler(teams, submissions, cfg.Flags)
+	loginPageHandler := endpoints.NewLoginPageHandler(cfg)
+	loginHandler := endpoints.NewLoginHandler(sessions)
 
 	router := mux.NewRouter()
 
@@ -63,7 +64,8 @@ func main() {
 	router.Handle("/register", registrationHandler)
 	router.Handle("/submit", submitPageHandler).Methods("GET")
 	router.Handle("/submit", submissionHandler).Methods("POST")
-	router.Handle("/login", loginHandler)
+	router.Handle("/login", loginPageHandler).Methods("GET")
+	router.Handle("/login", loginHandler).Methods("POST")
 	router.Handle("/logout", logoutHandler)
 	router.Handle("/admin", adminPageHandler)
 	router.Handle("/message", messageHander)

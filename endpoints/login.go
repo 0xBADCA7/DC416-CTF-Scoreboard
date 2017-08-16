@@ -2,88 +2,59 @@ package endpoints
 
 import (
 	"fmt"
-	"html/template"
 	"net/http"
-	"path"
-	"strings"
 
 	"github.com/DC416/DC416-CTF-Scoreboard/authentication"
-	"github.com/DC416/DC416-CTF-Scoreboard/config"
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
 type LoginHandler struct {
-	cfg      config.Config
 	sessions models.SessionModel
 }
 
-func NewLoginHandler(cfg config.Config, sessions models.SessionModel) LoginHandler {
+func NewLoginHandler(sessions models.SessionModel) LoginHandler {
 	return LoginHandler{
-		cfg,
 		sessions,
 	}
 }
 
-func (self LoginHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if strings.ToUpper(r.Method) == "POST" {
-		adminLogin(&self.cfg, self.sessions, w, r)
-	} else {
-		loginPage(&self.cfg, w, r)
-	}
-}
-
-// adminLogin checks the password provided to the application against a configured password,
-// granting access to the admin dashboard if the credentials are correct.
-func adminLogin(cfg *config.Config, sessions models.SessionModel, w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
+func (self LoginHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	err := req.ParseForm()
 	badPwdMsg := []byte("Incorrect password")
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write(badPwdMsg)
+		res.WriteHeader(http.StatusUnauthorized)
+		res.Header().Set("Content-Type", "text/plain")
+		res.Write(badPwdMsg)
 		return
 	}
-	password, found := r.Form["password"]
+	password, found := req.Form["password"]
 	if !found {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write(badPwdMsg)
+		res.WriteHeader(http.StatusUnauthorized)
+		res.Header().Set("Content-Type", "text/plain")
+		res.Write(badPwdMsg)
 		return
 	}
 	authErr := authentication.AdminLogin(password[0])
 	if authErr != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write(badPwdMsg)
+		res.WriteHeader(http.StatusUnauthorized)
+		res.Header().Set("Content-Type", "text/plain")
+		res.Write(badPwdMsg)
 		return
 	}
 	session := models.NewSession()
-	saveErr := sessions.Save(&session)
+	saveErr := self.sessions.Save(&session)
 	if saveErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte(fmt.Sprintf("Could not log in. Reason: %s\n", saveErr.Error())))
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Header().Set("Content-Type", "text/plain")
+		res.Write([]byte(fmt.Sprintf("Could not log in. Reason: %s\n", saveErr.Error())))
 		return
 	}
-	fmt.Println("Successful admin login by", r.RemoteAddr)
-	http.SetCookie(w, &http.Cookie{
+	fmt.Println("Successful admin login by", req.RemoteAddr)
+	http.SetCookie(res, &http.Cookie{
 		Name:    models.SessionCookieName,
 		Value:   session.Token,
 		Expires: session.Expires,
 	})
 	// adminURL defined in endpoints/admin.go
-	http.Redirect(w, r, adminURL, http.StatusSeeOther)
-}
-
-// loginPage serves a page containing a login form for admins to access the admin dashboard.
-func loginPage(cfg *config.Config, w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Got a request for the admin login page")
-	t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "login.html"))
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte("Could not load login page"))
-		return
-	}
-	err = t.Execute(w, nil)
+	http.Redirect(res, req, adminURL, http.StatusSeeOther)
 }
