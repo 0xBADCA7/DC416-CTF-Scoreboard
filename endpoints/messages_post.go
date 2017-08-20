@@ -1,6 +1,8 @@
 package endpoints
 
 import (
+	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/DC416/DC416-CTF-Scoreboard/authentication"
@@ -12,6 +14,15 @@ type MessagesPostHandler struct {
 	sessions models.SessionModel
 }
 
+type MessagesPostRequest struct {
+	SessionToken   string `json:"session"`
+	MessageContent string `json:"content"`
+}
+
+type MessagesPostResponse struct {
+	Error *string `json:"error"`
+}
+
 func NewMessagesPostHandler(messages models.MessageModel, sessions models.SessionModel) MessagesPostHandler {
 	return MessagesPostHandler{
 		messages,
@@ -20,34 +31,40 @@ func NewMessagesPostHandler(messages models.MessageModel, sessions models.Sessio
 }
 
 func (self MessagesPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	cookie, err := req.Cookie(models.SessionCookieName)
-	if err != nil {
-		res.WriteHeader(http.StatusUnauthorized)
-		res.Write([]byte("You are not authorized to do that."))
+	encoder := json.NewEncoder(res)
+	decoder := json.NewDecoder(req.Body)
+	defer req.Body.Close()
+
+	request := MessagesPostRequest{}
+	decodeErr := decoder.Decode(&request)
+	if decodeErr != nil {
+		res.WriteHeader(http.StatusBadRequest)
+		errMsg := "Invalid request."
+		encoder.Encode(MessagesPostResponse{
+			&errMsg,
+		})
 		return
 	}
-	authErr := authentication.CheckSessionToken(cookie.Value, self.sessions)
+	authErr := authentication.CheckSessionToken(request.SessionToken, self.sessions)
 	if authErr != nil {
-		err := req.ParseForm()
-		res.Header().Set("Content-Type", "text/plain")
-		if err != nil {
-			res.WriteHeader(http.StatusBadRequest)
-			res.Write([]byte("Invalid form data submitted."))
-			return
-		}
-		msgs, found := req.Form["message"]
-		if !found || len(msgs) == 0 || len(msgs[0]) == 0 {
-			res.WriteHeader(http.StatusBadRequest)
-			res.Write([]byte("No message provided."))
-			return
-		}
-		message := models.NewMessage(msgs[0])
-		err = self.messages.Save(&message)
-		if err != nil {
-			res.WriteHeader(http.StatusInternalServerError)
-			res.Write([]byte("Could not save message."))
-			return
-		}
-		res.Write([]byte("Successfully saved new message."))
+		res.WriteHeader(http.StatusUnauthorized)
+		errMsg := "You are not authorized to do that."
+		encoder.Encode(MessagesPostResponse{
+			&errMsg,
+		})
+		return
 	}
+	message := models.NewMessage(request.MessageContent)
+	err := self.messages.Save(&message)
+	if err != nil {
+		res.WriteHeader(http.StatusInternalServerError)
+		errMsg := fmt.Sprintf("Error saving new message: %s\n", err.Error())
+		encoder.Encode(MessagesPostResponse{
+			&errMsg,
+		})
+		return
+	}
+	encoder.Encode(MessagesPostResponse{
+		nil,
+	})
 }

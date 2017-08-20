@@ -52,6 +52,7 @@ func main() {
 	loginHandler := endpoints.NewLoginHandler(sessions)
 	messagesHandler := endpoints.NewMessagesHandler(messages)
 	messagePageHandler := endpoints.NewMessagePageHandler(cfg)
+	messagePostHandler := endpoints.NewMessagesPostHandler(messages, sessions)
 	adminPageHandler := endpoints.NewAdminPageHandler(cfg, submissions, teams, sessions)
 	adminTeamsHandler := endpoints.NewAdminTeamsHandler(cfg, submissions, teams, sessions)
 
@@ -71,6 +72,7 @@ func main() {
 	router.Handle("/logout", logoutHandler)
 	router.Handle("/admin", adminPageHandler).Methods("GET")
 	router.Handle("/admin/teams", adminTeamsHandler).Methods("GET")
+	router.Handle("/admin/messages", messagePostHandler).Methods("POST")
 	router.Handle("/message", messagePageHandler).Methods("GET")
 	router.Handle("/messages", messagesHandler).Methods("GET")
 	router.Handle("/deleteteam", deleteTeamHandler)

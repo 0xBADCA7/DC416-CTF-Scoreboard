@@ -34,11 +34,17 @@
     </div>
     <script>
 (function () {
+    const postMsgBtn = document.getElementById('postMessage');
     const buttons = Array.from(document.getElementsByClassName('delete-team-btn'));
     const teams = document.getElementById('teams');
 
     buttons.forEach((btn) => btn.addEventListener('click', deleteTeam));
     displayTeams();
+
+    postMsgBtn.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        postMessage();
+    });
 
     function deleteTeam (evt) {
         const name = evt.target.attributes.getNamedItem('data-name').value;
@@ -139,9 +145,10 @@
                 alert(`ERROR: ${response.error}`);
             } else {
                 alert('Successfully posted your message.');
+                messageContent.value = '';
             }
         });
-        xhr.submit(JSON.stringify({
+        xhr.send(JSON.stringify({
             session: cookieParts[1],
             content: messageContent.value
         }));
