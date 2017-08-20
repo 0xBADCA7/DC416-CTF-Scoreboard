@@ -22,15 +22,16 @@ type AdminTeamsRequest struct {
 }
 
 type AdminTeamsResponse struct {
-	Error *string         `json:"error"`
-	Teams []adminTeamInfo `json:"teams"`
+	Error    *string         `json:"error"`
+	NumFlags int             `json:"numFlags"`
+	Teams    []adminTeamInfo `json:"teams"`
 }
 
 type adminTeamInfo struct {
-	Id             int      `json:"id,omitempty"`
-	Name           string   `json:"name,omitempty"`
-	SubmitToken    string   `json:"submitToken,omitempty"`
-	SubmittedFlags []string `json:submittedFlags,omitempty"`
+	Id             int    `json:"id,omitempty"`
+	Name           string `json:"name,omitempty"`
+	SubmitToken    string `json:"submitToken,omitempty"`
+	SubmittedFlags []bool `json:"submittedFlags,omitempty"`
 }
 
 func NewAdminTeamsHandler(
@@ -50,6 +51,7 @@ func NewAdminTeamsHandler(
 func errResponse(errMsg *string) AdminTeamsResponse {
 	return AdminTeamsResponse{
 		errMsg,
+		0,
 		[]adminTeamInfo{},
 	}
 }
@@ -84,6 +86,7 @@ func (self AdminTeamsHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 	}
 	encoder.Encode(AdminTeamsResponse{
 		nil,
+		len(self.cfg.Flags),
 		teams,
 	})
 }
@@ -106,7 +109,7 @@ func (self AdminTeamsHandler) loadTeamInfo() ([]adminTeamInfo, error) {
 			Id:             team.Id,
 			Name:           team.Name,
 			SubmitToken:    team.SubmitToken,
-			SubmittedFlags: []string{},
+			SubmittedFlags: []bool{},
 		})
 		// I know a loop like this is going to look inefficient, but since the number
 		// of teams and flags are going to be small (surely less than 100 each),
@@ -115,13 +118,13 @@ func (self AdminTeamsHandler) loadTeamInfo() ([]adminTeamInfo, error) {
 			found := false
 			for _, submission := range submissions {
 				if flag.Id == submission.Flag {
-					teamInfo[index].SubmittedFlags = append(teamInfo[index].SubmittedFlags, flagFound)
+					teamInfo[index].SubmittedFlags = append(teamInfo[index].SubmittedFlags, true)
 					found = true
 					break
 				}
 			}
 			if !found {
-				teamInfo[index].SubmittedFlags = append(teamInfo[index].SubmittedFlags, flagNotFound)
+				teamInfo[index].SubmittedFlags = append(teamInfo[index].SubmittedFlags, false)
 			}
 		}
 		index += 1

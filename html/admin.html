@@ -29,9 +29,6 @@
           <th></th>
           <th>Team Name</th>
           <th>Submission Token</th>
-          {{range .Flags}}
-          <th class="flag">{{.Id}}</th>
-          {{end}}
         </tr>
       </table>
     </div>
@@ -77,6 +74,14 @@
                 return;
             }
 
+            const teamsHeader = document.getElementById('teamsheader');
+            for (let i = 0; i < response.numFlags; i++) {
+                const th = document.createElement('th');
+                th.classList = 'flag';
+                th.innerHTML = `${i + 1}`;
+                teamsHeader.appendChild(th);
+            }
+
             for (const team of response.teams) {
                 const teamRow = document.createElement('tr');
                 const deleteBtnTd = document.createElement('td');
@@ -97,6 +102,12 @@
                 teamRow.appendChild(deleteBtnTd);
                 teamRow.appendChild(teamNameTd);
                 teamRow.appendChild(submitTokenTd);
+
+                for (const submitted of team.submittedFlags) {
+                    const flagTd = document.createElement('td');
+                    flagTd.innerHTML = submitted ? '✔' : ' ';
+                    teamRow.appendChild(flagTd);
+                }
 
                 teams.appendChild(teamRow);
             }

@@ -185,7 +185,7 @@ Obtain a list of secret information about teams.
             "id": int,
             "name: string,
             "submitToken": string,
-            "submittedFlags": []string
+            "submittedFlags": []boolean
         }
     ]
 }
