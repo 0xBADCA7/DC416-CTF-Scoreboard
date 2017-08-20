@@ -160,3 +160,33 @@ None
     ]
 }
 ```
+
+### Get a list of teams for administrators
+
+    GET /admin/teams
+
+Obtain a list of secret information about teams.
+
+#### Parameters
+
+```json
+{
+    "session": string
+}
+```
+
+#### Response
+
+```json
+{
+    "error": string | null,
+    "teams": [
+        {
+            "id": int,
+            "name: string,
+            "submitToken": string,
+            "submittedFlags": []string
+        }
+    ]
+}
+```
