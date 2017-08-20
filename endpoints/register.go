@@ -31,7 +31,12 @@ func NewRegistrationHandler(cfg config.Config, teams models.TeamModel, sessions 
 
 // ServeHTTP handles requests to either view a registration form or upload a new team's info.
 func (self RegistrationHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	authErr := authentication.CheckSessionToken(req, self.sessions)
+	cookie, err := req.Cookie(models.SessionCookieName)
+	if err != nil {
+		http.Redirect(res, req, "/", http.StatusUnauthorized)
+		return
+	}
+	authErr := authentication.CheckSessionToken(cookie.Value, self.sessions)
 	if authErr != nil {
 		http.Redirect(res, req, "/", http.StatusSeeOther)
 	} else if strings.ToUpper(req.Method) == "POST" {

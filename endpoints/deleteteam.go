@@ -23,7 +23,12 @@ func NewDeleteTeamHandler(teams models.TeamModel, sessions models.SessionModel) 
 
 func (self DeleteTeamHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	authErr := authentication.CheckSessionToken(r, self.sessions)
+	cookie, err := r.Cookie(models.SessionCookieName)
+	if err != nil {
+		jsonError(w, http.StatusUnauthorized, "You are not authorized to do that.")
+		return
+	}
+	authErr := authentication.CheckSessionToken(cookie.Value, self.sessions)
 	if authErr != nil {
 		jsonError(w, http.StatusUnauthorized, "You are not authorized to do that.")
 		return

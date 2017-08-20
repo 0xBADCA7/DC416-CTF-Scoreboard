@@ -20,7 +20,13 @@ func NewMessagesPostHandler(messages models.MessageModel, sessions models.Sessio
 }
 
 func (self MessagesPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
-	authErr := authentication.CheckSessionToken(req, self.sessions)
+	cookie, err := req.Cookie(models.SessionCookieName)
+	if err != nil {
+		res.WriteHeader(http.StatusUnauthorized)
+		res.Write([]byte("You are not authorized to do that."))
+		return
+	}
+	authErr := authentication.CheckSessionToken(cookie.Value, self.sessions)
 	if authErr != nil {
 		err := req.ParseForm()
 		res.Header().Set("Content-Type", "text/plain")
