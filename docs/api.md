@@ -114,7 +114,7 @@ Here, `token` is the team's secret submission token, sent to them by an administ
 
 ### Login to the admin console
 
-    POST /admin
+    POST /login
 
 Log into the admin console in order to be able to create and delete teams, as well as view each
 team's submitted flags and submission token.
