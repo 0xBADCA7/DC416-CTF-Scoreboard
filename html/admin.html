@@ -7,7 +7,7 @@
   </head>
   <body>
     <div id="main" class="center">
-      <a href="/logout">Logout</a> |
+      <a id="logoutButton" href="#">Logout</a> |
       <a href="/register">Register a new team</a>
       <h1>Post a Message</h1>
       <div class="center">
@@ -35,6 +35,7 @@
     <script>
 (function () {
     const postMsgBtn = document.getElementById('postMessage');
+    const logoutBtn = document.getElementById('logoutButton');
     const buttons = Array.from(document.getElementsByClassName('delete-team-btn'));
     const teams = document.getElementById('teams');
 
@@ -44,6 +45,12 @@
     postMsgBtn.addEventListener('click', (evt) => {
         evt.preventDefault();
         postMessage();
+    });
+
+    logoutBtn.addEventListener('click', () => {
+        console.log('User clicked loguot');
+        document.cookie = 'session=;expires=Thu, 01 Jan 1970 00:00:01 GMT"';
+        window.location = '/';
     });
 
     function deleteTeam (evt) {
