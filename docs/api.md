@@ -154,7 +154,7 @@ None
 {
     "messages": [
         {
-            "written": date,
+            "created": date,
             "message": string
         }
     ]
