@@ -57,17 +57,16 @@ func errResponse(errMsg *string) AdminTeamsResponse {
 func (self AdminTeamsHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
 	res.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(res)
-	decoder := json.NewDecoder(req.Body)
-	defer req.Body.Close()
 
+	sessions, found := req.URL.Query()["session"]
 	request := AdminTeamsRequest{}
-	decodeErr := decoder.Decode(&request)
-	if decodeErr != nil {
+	if !found || len(sessions) == 0 || len(sessions[0]) == 0 {
 		res.WriteHeader(http.StatusBadRequest)
-		errMsg := "Invalid request format."
+		errMsg := "Invalid request"
 		encoder.Encode(errResponse(&errMsg))
 		return
 	}
+	request.SessionToken = sessions[0]
 	authErr := authentication.CheckSessionToken(request.SessionToken, self.sessions)
 	if authErr != nil {
 		res.WriteHeader(http.StatusForbidden)
