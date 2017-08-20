@@ -10,17 +10,43 @@
       <a href="/">Back</a>
       <h1>Messages from the Admins</h1>
       <ul id="messages">
-        {{range .Messages}}
-        <li class="message">
-          <div class="date">
-            {{.CreatedAt}}
-          </div>
-          <div class="content">
-            {{.Content}}
-          </div>
-        </li>
-        {{end}}
       </ul>
     </div>
+    <script>
+(function () { 
+    let messages = document.getElementById('messages');
+    let xhr = new XMLHttpRequest();
+
+    xhr.open('GET', '/messages');
+
+    xhr.addEventListener('load', () => {
+        console.log(xhr.responseText);
+        if (xhr.status !== 200) {
+            return;
+        }
+        
+        let response = JSON.parse(xhr.responseText);
+
+        for (let message of response.messages) {
+            let msgLi = document.createElement('li');
+            let dateDiv = document.createElement('div');
+            let contentDiv = document.createElement('div');
+
+            msgLi.classList = 'message';
+            dateDiv.classList = 'date';
+            contentDiv.classList = 'content';
+
+            dateDiv.innerHTML = message.created;
+            contentDiv.innerHTML = message.message;
+
+            msgLi.appendChild(dateDiv);
+            msgLi.appendChild(contentDiv);
+            messages.appendChild(msgLi);
+        }
+    });
+
+    xhr.send();
+})();
+    </script>
   </body>
 </html>
