@@ -15,10 +15,10 @@
           <fieldset>
             <div class="pure-control-group">
               <label for="message">Message:</label>
-              <textarea name="message"></textarea>
+              <textarea id="messageContent" name="message"></textarea>
             </div>
             <div class="pure-controls">
-              <button type="submit" class="pure-button pure-button-primary">Submit</button>
+              <button id="postMessage" type="submit" class="pure-button pure-button-primary">Submit</button>
             </div>
           </fieldset>
         </form>
@@ -120,6 +120,31 @@
         }
         xhr.open('GET', `/admin/teams?session=${cookieParts[1]}`);
         xhr.send();
+    }
+
+    function postMessage() {
+        const messageContent = document.getElementById('messageContent');
+        const xhr = new XMLHttpRequest();
+        
+        const cookieParts = document.cookie.split('=');
+        if (cookieParts.length != 2) {
+            window.href = '/';
+            return;
+        }
+
+        xhr.open('POST', '/admin/messages');
+        xhr.addEventListener('load', () => {
+            const response = JSON.parse(xhr.responseText);
+            if (response.error !== null) {
+                alert(`ERROR: ${response.error}`);
+            } else {
+                alert('Successfully posted your message.');
+            }
+        });
+        xhr.submit(JSON.stringify({
+            session: cookieParts[1],
+            content: messageContent.value
+        }));
     }
 })();
     </script>

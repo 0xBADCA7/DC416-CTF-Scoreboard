@@ -161,6 +161,29 @@ None
 }
 ```
 
+### Post a new message for participants
+
+    POST /admin/messages
+
+Post a new message that will be displayed to participants in the CTF.
+
+#### Parameters
+
+```json
+{
+    "session": string,
+    "content": string
+}
+```
+
+#### Response
+
+```json
+{
+    "error": string | null
+}
+```
+
 ### Get a list of teams for administrators
 
     GET /admin/teams
