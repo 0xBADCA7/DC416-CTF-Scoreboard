@@ -73,7 +73,7 @@ func main() {
 	router.Handle("/admin/messages", messagePostHandler).Methods("POST")
 	router.Handle("/message", messagePageHandler).Methods("GET")
 	router.Handle("/messages", messagesHandler).Methods("GET")
-	router.Handle("/deleteteam", deleteTeamHandler)
+	router.Handle("/teams", deleteTeamHandler).Methods("DELETE")
 
 	http.Handle("/", router)
 	fmt.Println("Listening on", cfg.BindAddress)

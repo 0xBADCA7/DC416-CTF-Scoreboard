@@ -36,10 +36,8 @@
 (function () {
     const postMsgBtn = document.getElementById('postMessage');
     const logoutBtn = document.getElementById('logoutButton');
-    const buttons = Array.from(document.getElementsByClassName('delete-team-btn'));
     const teams = document.getElementById('teams');
 
-    buttons.forEach((btn) => btn.addEventListener('click', deleteTeam));
     displayTeams();
 
     postMsgBtn.addEventListener('click', (evt) => {
@@ -62,16 +60,15 @@
 
         let request = new XMLHttpRequest();
         request.addEventListener('load', () => {
-            const response = request.responseText === null
-                ? {error: 'Invalid response from server.'}
-                : JSON.parse(request.responseText);
+            const response = JSON.parse(request.responseText);
+            console.log('Got response', request.responseText);
             if (response.error !== null) {
                 alert(`Error deleting team. Reason: ${response.error}`);
             } else {
                 document.location = '/admin';
             }
         });
-        request.open('DELETE', `/deleteteam?id=${id}`, true);
+        request.open('DELETE', `/teams?id=${id}`, true);
         request.send();
     }
 
@@ -106,6 +103,7 @@
                 deleteLink.setAttribute('data-name', team.name);
                 deleteLink.classList = 'delete-team-btn';
                 deleteLink.innerHTML = 'Delete';
+                deleteLink.addEventListener('click', deleteTeam);
 
                 teamNameTd.innerHTML = team.name;
                 submitTokenTd.innerHTML = team.submitToken;
