@@ -39,6 +39,7 @@
             } else {
                 alert(`Your score is now ${response.newScore}`);
             }
+            window.location = '/';
         });
         xhr.send(JSON.stringify({
             token: tokenField.value,
