@@ -112,6 +112,31 @@ Here, `token` is the team's secret submission token, sent to them by an administ
 }
 ```
 
+### Register a new team
+
+    POST /teams/register
+
+Create a new team, enabling participation in the CTF.
+
+#### Parameters
+
+```json
+{
+    "session": string,
+    "name": string,
+    "members": string
+}
+```
+
+#### Response
+
+```json
+{
+    "error": string | null,
+    "submitToken": string
+}
+```
+
 ### Login to the admin console
 
     POST /login
