@@ -12,17 +12,55 @@
         <fieldset>
           <div class="pure-control-group">
             <label for="name">Team name:</label>
-            <input type="text" name="name" />
+            <input id="teamName" type="text" name="name" />
           </div>
           <div class="pure-control-group">
             <label for="members">Members:</label>
-            <input type="text" name="members" />
+            <input id="teamMembers" type="text" name="members" />
           </div>
           <div class="pure-controls">
-             <button type="submit" class="pure-button pure-button-primary">Register</button>
+             <button id="registerButton" type="submit" class="pure-button pure-button-primary">Register</button>
           </div>
         </fieldset>
       </form>
     </div>
+    <script>
+(function () {
+    const registerBtn = document.getElementById('registerButton');
+
+    registerBtn.addEventListener('click', (evt) => {
+        evt.preventDefault();
+        registerTeam();
+    });
+
+    function registerTeam() {
+        const teamName = document.getElementById('teamName');
+        const teamMembers = document.getElementById('teamMembers');
+        const xhr = new XMLHttpRequest();
+
+        const cookieParts = document.cookie.split('=');
+        if (cookieParts.length != 2) {
+            return;
+        }
+
+        xhr.open('POST', '/teams/register');
+        xhr.addEventListener('load', () => {
+            const response = JSON.parse(xhr.responseText);
+            if (response.error !== null) {
+                alert(`ERROR: ${response.error}`);
+            } else {
+                alert(`Created team. Submission token = ${response.submitToken}`);
+            }
+            teamName.value = '';
+            teamMembers.value = '';
+        });
+        xhr.send(JSON.stringify({
+            session: cookieParts[1],
+            name: teamName.value,
+            members: teamName.value
+        }));
+    }
+})();
+    </script>
   </body>
 </html>
