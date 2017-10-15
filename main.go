@@ -61,6 +61,7 @@ func main() {
 	// http.Handle("/js/", http.FileServer(http.Dir(".")))
 	http.Handle("/img/", http.FileServer(http.Dir(".")))
 	router.Handle("/", indexHandler)
+	router.Handle("/main.js", http.FileServer(http.Dir(".")))
 	router.Handle("/event", eventInfoHandler)
 	router.Handle("/teams/scoreboard", scoreboardHandler)
 	router.Handle("/register", registerPageHandler).Methods("GET")

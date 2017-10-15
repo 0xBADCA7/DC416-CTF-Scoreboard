@@ -6,7 +6,6 @@ import (
 	"io/ioutil"
 	"net/http"
 	"os"
-	"path"
 
 	"github.com/DC416/DC416-CTF-Scoreboard/config"
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
@@ -29,7 +28,7 @@ func NewIndexHandler(cfg config.Config, teams models.TeamModel) IndexHandler {
 // Index creates a request handler that serves index.html, the main scoreboard page with all of
 // the teams and their scores.
 func (self IndexHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	templateFile, err := os.Open(path.Join(self.cfg.HTMLDir, "index.html"))
+	templateFile, err := os.Open("index.html")
 	if err != nil {
 		fmt.Println("Error parsing template", err)
 		w.WriteHeader(http.StatusInternalServerError)
