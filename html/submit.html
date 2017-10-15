@@ -8,15 +8,15 @@
   <body>
     <div class="center">
       <h1>Submit a flag</h1>
-      <form action="/submit" method="post" class="pure-form pure-form-aligned">
+      <form id="submitForm" action="/submit" method="post" class="pure-form pure-form-aligned">
         <fieldset>
           <div class="pure-control-group">
             <label for="token">Submission token:</label>
-            <input type="text" name="token" />
+            <input id="tokenField" type="text" name="token" />
           </div>
           <div class="pure-control-group">
             <label for="flag">Secret flag:</label>
-            <input type="text" name="flag" />
+            <input id="flagField" type="text" name="flag" />
           </div>
           <div class="pure-controls">
              <button type="submit" class="pure-button pure-button-primary">Submit</button>
@@ -24,5 +24,36 @@
         </fieldset>
       </form>
     </div>
+    <script>
+(function () {
+    function submitFlag () {
+        let tokenField = document.getElementById('tokenField');
+        let flagField = document.getElementById('flagField');
+        let xhr = new XMLHttpRequest();
+
+        xhr.open('POST', '/submit');
+        xhr.addEventListener('load', () => {
+            let response = JSON.parse(xhr.responseText);
+            if (response.error !== null) {
+                alert(`ERROR: ${response.error}`);
+            } else {
+                alert(`Your score is now ${response.newScore}`);
+            }
+            window.location = '/';
+        });
+        xhr.send(JSON.stringify({
+            token: tokenField.value,
+            flag: flagField.value
+        }));
+    }
+
+    let form = document.getElementById('submitForm');
+    form.addEventListener('submit', (evt) => {
+        evt.preventDefault();
+        submitFlag();
+    });
+
+})();
+    </script>
   </body>
 </html>

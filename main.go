@@ -6,15 +6,18 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gorilla/mux"
 	_ "github.com/mattn/go-sqlite3"
 
-	"./authentication"
-	"./config"
-	"./endpoints"
-	"./models"
+	"github.com/DC416/DC416-CTF-Scoreboard/authentication"
+	"github.com/DC416/DC416-CTF-Scoreboard/config"
+	"github.com/DC416/DC416-CTF-Scoreboard/endpoints"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
 func main() {
+	authentication.HashAdminPassword()
+
 	cfgFile := os.Getenv("CONFIG_FILE")
 	if cfgFile == "" {
 		cfgFile = "./config/config.json"
@@ -31,19 +34,49 @@ func main() {
 		panic(err)
 	}
 
-	authentication.HashAdminPassword()
+	messages := models.NewMessageModelDB(db)
+	teams := models.NewTeamModelDB(db)
+	sessions := models.NewSessionModelDB(db)
+	submissions := models.NewSubmissionModelDB(db)
+
+	indexHandler := endpoints.NewIndexHandler(cfg, teams)
+	eventInfoHandler := endpoints.NewEventInfoHandler(cfg.CTFName)
+	scoreboardHandler := endpoints.NewTeamsScoreboardHandler(teams)
+	submitPageHandler := endpoints.NewSubmitPageHandler(cfg)
+	submissionHandler := endpoints.NewTeamSubmitHandler(teams, submissions, cfg.Flags)
+	loginPageHandler := endpoints.NewLoginPageHandler(cfg)
+	loginHandler := endpoints.NewLoginHandler(sessions)
+	messagesHandler := endpoints.NewMessagesHandler(messages)
+	messagePageHandler := endpoints.NewMessagePageHandler(cfg)
+	messagePostHandler := endpoints.NewMessagesPostHandler(messages, sessions)
+	adminPageHandler := endpoints.NewAdminPageHandler(cfg, submissions, teams, sessions)
+	adminTeamsHandler := endpoints.NewAdminTeamsHandler(cfg, submissions, teams, sessions)
+	deleteTeamHandler := endpoints.NewDeleteTeamHandler(teams, sessions)
+	registerPageHandler := endpoints.NewRegisterPageHandler(cfg, sessions)
+	registerHandler := endpoints.NewRegisterTeamHandler(teams, sessions)
+
+	router := mux.NewRouter()
 
 	http.Handle("/css/", http.FileServer(http.Dir(".")))
-	http.Handle("/js/", http.FileServer(http.Dir(".")))
+	// http.Handle("/js/", http.FileServer(http.Dir(".")))
 	http.Handle("/img/", http.FileServer(http.Dir(".")))
-	http.HandleFunc("/", endpoints.Index(db, &cfg))
-	http.HandleFunc("/register", endpoints.Register(db, &cfg))
-	http.HandleFunc("/submit", endpoints.Submit(db, &cfg))
-	http.HandleFunc("/login", endpoints.Login(db, &cfg))
-	http.HandleFunc("/logout", endpoints.Logout(db, &cfg))
-	http.HandleFunc("/admin", endpoints.Admin(db, &cfg))
-	http.HandleFunc("/message", endpoints.PostMessage(db, &cfg))
-	http.HandleFunc("/deleteteam", endpoints.DeleteTeam(db, &cfg))
+	router.Handle("/", indexHandler)
+	router.Handle("/event", eventInfoHandler)
+	router.Handle("/teams/scoreboard", scoreboardHandler)
+	router.Handle("/register", registerPageHandler).Methods("GET")
+	router.Handle("/teams/register", registerHandler).Methods("POST")
+	router.Handle("/submit", submitPageHandler).Methods("GET")
+	router.Handle("/submit", submissionHandler).Methods("POST")
+	router.Handle("/login", loginPageHandler).Methods("GET")
+	router.Handle("/login", loginHandler).Methods("POST")
+	router.Handle("/admin", adminPageHandler).Methods("GET")
+	router.Handle("/admin/teams", adminTeamsHandler).Methods("GET")
+	router.Handle("/admin/messages", messagePostHandler).Methods("POST")
+	router.Handle("/message", messagePageHandler).Methods("GET")
+	router.Handle("/messages", messagesHandler).Methods("GET")
+	router.Handle("/teams", deleteTeamHandler).Methods("DELETE")
+
+	http.Handle("/", router)
 	fmt.Println("Listening on", cfg.BindAddress)
 	http.ListenAndServe(cfg.BindAddress, nil)
 }

@@ -4,11 +4,46 @@ import (
 	"database/sql"
 )
 
-// FindSubmission attempts to find an entry in the submission table for the flag that the user is submitting
+// Submission contains information about a flag submitted by a team.
+// The flag ID is an integer that is specified in the application config and is unique.
+type Submission struct {
+	Id    int
+	Flag  int
+	Owner int
+}
+
+// SubmissionModel is implemented by types that can lookup submissions made by teams
+// and store new submissions for teams.
+type SubmissionModel interface {
+	Find(int, int) (Submission, error)
+	All(int) ([]Submission, error)
+	Save(*Submission) error
+}
+
+// SubmissionModelDB implements SubmissionModel to work with a sqlite datbase.
+type SubmissionModelDB struct {
+	db *sql.DB
+}
+
+// NewSubmission creates a new Submission for a given flag being sent by a given team.
+func NewSubmission(flagId, ownerId int) Submission {
+	return Submission{
+		-1,
+		flagId,
+		ownerId,
+	}
+}
+
+// NewSubmissionModelDB constructs a new SubmissionModelDB capable of working with a sqlite database.
+func NewSubmissionModelDB(db *sql.DB) SubmissionModelDB {
+	return SubmissionModelDB{db}
+}
+
+// Find attempts to find an entry in the submission table for the flag that the user is submitting
 // for their team.
-func FindSubmission(db *sql.DB, teamId int, flagId int) (Submission, error) {
+func (self SubmissionModelDB) Find(teamId int, flagId int) (Submission, error) {
 	s := Submission{}
-	err := db.QueryRow(QFindSubmission, teamId, flagId).Scan(&s.Id)
+	err := self.db.QueryRow(QFindSubmission, teamId, flagId).Scan(&s.Id)
 	if err != nil {
 		return Submission{}, err
 	}
@@ -17,10 +52,10 @@ func FindSubmission(db *sql.DB, teamId int, flagId int) (Submission, error) {
 	return s, nil
 }
 
-// FindAllSubmissions attempts to find all of the submissions made by a given team.
-func FindAllSubmissions(db *sql.DB, teamId int) ([]Submission, error) {
+// All attempts to find all of the submissions made by a given team.
+func (self SubmissionModelDB) All(teamId int) ([]Submission, error) {
 	submissions := []Submission{}
-	rows, err := db.Query(QFindAllSubmissions, teamId)
+	rows, err := self.db.Query(QFindAllSubmissions, teamId)
 	if err != nil {
 		return submissions, err
 	}
@@ -39,16 +74,12 @@ func FindAllSubmissions(db *sql.DB, teamId int) ([]Submission, error) {
 	return submissions, nil
 }
 
-// Submission contains information about a flag submitted by a team.
-// The flag ID is an integer that is specified in the application config and is unique.
-type Submission struct {
-	Id    int
-	Flag  int
-	Owner int
-}
-
 // Save creates a new record of a team submitting a flag.
-func (s *Submission) Save(db *sql.DB) error {
-	_, err := db.Exec(QSaveSubmission, s.Owner, s.Flag)
+func (self SubmissionModelDB) Save(submission *Submission) error {
+	_, err := self.db.Exec(QSaveSubmission, submission.Owner, submission.Flag)
+	if err != nil {
+		return err
+	}
+	err = self.db.QueryRow(QLastInsertedId).Scan(&submission.Id)
 	return err
 }

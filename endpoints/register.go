@@ -1,82 +1,51 @@
 package endpoints
 
 import (
-	"database/sql"
-	"fmt"
 	"html/template"
 	"net/http"
 	"path"
-	"strings"
 
-	"../authentication"
-	"../config"
-	"../models"
+	"github.com/DC416/DC416-CTF-Scoreboard/authentication"
+	"github.com/DC416/DC416-CTF-Scoreboard/config"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
-// Register presents a page which users can use to register.
-func Register(db *sql.DB, cfg *config.Config) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		authErr := authentication.CheckSessionToken(r, db)
-		if authErr != nil {
-			http.Redirect(w, r, "/", http.StatusSeeOther)
-		} else if strings.ToUpper(r.Method) == "POST" {
-			registerNewTeam(db, cfg, w, r)
-		} else {
-			registerPage(db, cfg, w, r)
-		}
+// RegisterPageHandler handles requests to retrieve the page on which teams can be registered.
+type RegisterPageHandler struct {
+	cfg      config.Config
+	sessions models.SessionModel
+}
+
+// NewRegisterPageHandler constructs a new RegisterPageHandler with the capability to access information about
+// administrator sessions.
+func NewRegisterPageHandler(cfg config.Config, sessions models.SessionModel) RegisterPageHandler {
+	return RegisterPageHandler{
+		cfg,
+		sessions,
 	}
 }
 
-// registerNewTeam handles a POST request that contains new team data and creates a team
-// in the database.
-func registerNewTeam(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
-	team := models.Team{}
-	fmt.Println("Got a POST request to register a new team")
-	err := r.ParseForm()
-	w.Header().Set("Content-Type", "text/plain")
+func (self RegisterPageHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	cookie, err := req.Cookie(models.SessionCookieName)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("You submitted invalid form data"))
+		res.WriteHeader(http.StatusUnauthorized)
+		res.Header().Set("Content-Type", "text/plain")
+		res.Write([]byte("You are not allowed to do that."))
 		return
 	}
-	fmt.Println("Got POST data", r.Form)
-	names, found := r.Form["name"]
-	if !found || len(names) == 0 {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("You did not submit a team name"))
+	authErr := authentication.CheckSessionToken(cookie.Value, self.sessions)
+	if authErr != nil {
+		res.WriteHeader(http.StatusUnauthorized)
+		res.Header().Set("Content-Type", "text/plain")
+		res.Write([]byte("You are not allowed to do that."))
 		return
 	}
-	members, found := r.Form["members"]
-	if !found || len(members) == 0 {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("You did not submit your members' names"))
-		return
-	}
-	team.Name = names[0]
-	team.Members = members[0]
-	err = team.Save(db)
+	t, err := template.ParseFiles(path.Join(self.cfg.HTMLDir, "register.html"))
 	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Write([]byte("Could not create your team. Please make sure your name is not taken."))
+		res.WriteHeader(http.StatusInternalServerError)
+		res.Header().Set("Content-Type", "text/plain")
+		res.Write([]byte("Could not load register page"))
 		return
 	}
-	msg := fmt.Sprintf(`Your team has successfully been registered.
-Your submission token is %s.
-Please make sure not to lose or share it with anyone not on your team.`,
-		team.SubmitToken)
-	w.Write([]byte(msg))
-}
-
-// registerPage serves the register.html page which contains a form that users can fill out
-// to register their team.
-func registerPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Got a request for the register page")
-	t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "register.html"))
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte("Could not load register page"))
-		return
-	}
-	err = t.Execute(w, nil)
+	err = t.Execute(res, nil)
 }

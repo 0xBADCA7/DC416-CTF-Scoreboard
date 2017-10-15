@@ -1,82 +1,82 @@
 package endpoints
 
 import (
-	"database/sql"
+	"encoding/json"
 	"fmt"
-	"html/template"
 	"net/http"
-	"path"
-	"strings"
 
-	"../authentication"
-	"../config"
-	"../models"
+	"github.com/DC416/DC416-CTF-Scoreboard/authentication"
+	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
-// Login presents routes GET requests to serve a login page for admins and POST
-// requests to handle a login form submission.
-func Login(db *sql.DB, cfg *config.Config) http.HandlerFunc {
-	return func(w http.ResponseWriter, r *http.Request) {
-		if strings.ToUpper(r.Method) == "POST" {
-			adminLogin(db, cfg, w, r)
-		} else {
-			loginPage(db, cfg, w, r)
-		}
+// LoginHandler handles requests for administrators logging in.
+type LoginHandler struct {
+	sessions models.SessionModel
+}
+
+type loginRequest struct {
+	Password string `json:"password"`
+}
+
+type loginResponse struct {
+	Error      *string `json:"error"`
+	Session    string  `json:"session"`
+	RedirectTo string  `json:"redirect"`
+}
+
+// NewLoginHandler constructs a new LoginHandler with the capability to manage sessions.
+func NewLoginHandler(sessions models.SessionModel) LoginHandler {
+	return LoginHandler{
+		sessions,
 	}
 }
 
-// adminLogin checks the password provided to the application against a configured password,
-// granting access to the admin dashboard if the credentials are correct.
-func adminLogin(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	badPwdMsg := []byte("Incorrect password")
+func (self LoginHandler) ServeHTTP(res http.ResponseWriter, req *http.Request) {
+	res.Header().Set("Content-Type", "application/json")
+	encoder := json.NewEncoder(res)
+	decoder := json.NewDecoder(req.Body)
+	defer req.Body.Close()
+
+	request := loginRequest{}
+	err := decoder.Decode(&request)
 	if err != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write(badPwdMsg)
+		res.WriteHeader(http.StatusBadRequest)
+		errMsg := "Invalid request data"
+		encoder.Encode(loginResponse{
+			Error:      &errMsg,
+			Session:    "",
+			RedirectTo: "",
+		})
 		return
 	}
-	password, found := r.Form["password"]
-	if !found {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write(badPwdMsg)
-		return
-	}
-	authErr := authentication.AdminLogin(db, password[0])
+	authErr := authentication.AdminLogin(request.Password)
 	if authErr != nil {
-		w.WriteHeader(http.StatusUnauthorized)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write(badPwdMsg)
+		res.WriteHeader(http.StatusUnauthorized)
+		errMsg := "Incorrect password"
+		encoder.Encode(loginResponse{
+			Error:      &errMsg,
+			Session:    "",
+			RedirectTo: "",
+		})
 		return
 	}
 	session := models.NewSession()
-	saveErr := session.Save(db)
+	saveErr := self.sessions.Save(&session)
 	if saveErr != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte(fmt.Sprintf("Could not log in. Reason: %s\n", saveErr.Error())))
+		res.WriteHeader(http.StatusInternalServerError)
+		fmt.Println("Admin login failed due to internal server error: %s\n", saveErr.Error())
+		errMsg := "Server encountered an error"
+		encoder.Encode(loginResponse{
+			Error:      &errMsg,
+			Session:    "",
+			RedirectTo: "",
+		})
 		return
 	}
-	fmt.Println("Successful admin login by", r.RemoteAddr)
-	http.SetCookie(w, &http.Cookie{
-		Name:    models.SessionCookieName,
-		Value:   session.Token,
-		Expires: session.Expires,
+	fmt.Println("Successful admin login by", req.RemoteAddr)
+	encoder.Encode(loginResponse{
+		Error:      nil,
+		Session:    session.Token,
+		RedirectTo: "/admin",
 	})
-	// adminURL defined in endpoints/admin.go
-	http.Redirect(w, r, adminURL, http.StatusSeeOther)
-}
-
-// loginPage serves a page containing a login form for admins to access the admin dashboard.
-func loginPage(db *sql.DB, cfg *config.Config, w http.ResponseWriter, r *http.Request) {
-	fmt.Println("Got a request for the admin login page")
-	t, err := template.ParseFiles(path.Join(cfg.HTMLDir, "login.html"))
-	if err != nil {
-		w.WriteHeader(http.StatusInternalServerError)
-		w.Header().Set("Content-Type", "text/plain")
-		w.Write([]byte("Could not load login page"))
-		return
-	}
-	err = t.Execute(w, nil)
 }
