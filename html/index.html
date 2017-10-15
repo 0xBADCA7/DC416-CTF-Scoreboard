@@ -27,7 +27,7 @@
     xhr.onload = function () {
         document.getElementById('eventname').innerHTML = `${xhr.response.name} Scoreboard`;
     };
-    xhr.open('GET', 'http://localhost:3000/event');
+    xhr.open('GET', '/event');
     xhr.responseType = 'json';
     xhr.send();
 
@@ -54,7 +54,7 @@
             scoreboard.appendChild(row);
         }
     };
-    xhr2.open('GET', 'http://localhost:3000/teams/scoreboard');
+    xhr2.open('GET', '/teams/scoreboard');
     xhr2.responseType = 'json';
     xhr2.send();
 })();
