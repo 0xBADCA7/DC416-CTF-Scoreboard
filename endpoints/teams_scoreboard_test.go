@@ -19,7 +19,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 	server := httptest.NewServer(handler)
 	defer server.Close()
 
-	type testFn func(TeamScoreboardResponse) error
+	type testFn func(teamScoreboardResponse) error
 
 	// Makes a request that gets handled the team scoreboard handler and runs a test function that
 	// can inspect (upon successful decoding) the JSON returned by the handler.
@@ -31,7 +31,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 		if response.StatusCode != 200 {
 			return errors.New(fmt.Sprintf("Expected status code 200. Got %d\n", response.StatusCode))
 		}
-		data := TeamScoreboardResponse{}
+		data := teamScoreboardResponse{}
 		decoder := json.NewDecoder(response.Body)
 		defer response.Body.Close()
 		err = decoder.Decode(&data)
@@ -43,7 +43,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 
 	// Produces a function that can be passed to testOutput to check the number of teams returned.
 	testLenTeams := func(expectedLen int) testFn {
-		return func(data TeamScoreboardResponse) error {
+		return func(data teamScoreboardResponse) error {
 			numTeams := len(data.Teams)
 			if numTeams != expectedLen {
 				return errors.New(fmt.Sprintf("Expected %d teams. Found %d\n", expectedLen, numTeams))
@@ -55,7 +55,7 @@ func TestScoreboardEndpoint(test *testing.T) {
 	// Produces a function that can be passed to testOutput that checks if a team is presnt
 	// in the response from the server.
 	tryFindTeam := func(team models.Team) testFn {
-		return func(data TeamScoreboardResponse) error {
+		return func(data teamScoreboardResponse) error {
 			for _, teamFound := range data.Teams {
 				teamIsExpected := teamFound.Name == team.Name &&
 					teamFound.Score == team.Score &&

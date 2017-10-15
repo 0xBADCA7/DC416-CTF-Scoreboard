@@ -12,11 +12,13 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
+// IndexHandler handles requests for the app's index page.
 type IndexHandler struct {
 	cfg   config.Config
 	teams models.TeamModel
 }
 
+// NewIndexHandler constructs a new IndexHandler with the capability of accessing information about teams.
 func NewIndexHandler(cfg config.Config, teams models.TeamModel) IndexHandler {
 	return IndexHandler{
 		cfg,

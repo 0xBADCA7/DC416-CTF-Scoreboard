@@ -10,11 +10,14 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
+// RegisterPageHandler handles requests to retrieve the page on which teams can be registered.
 type RegisterPageHandler struct {
 	cfg      config.Config
 	sessions models.SessionModel
 }
 
+// NewRegisterPageHandler constructs a new RegisterPageHandler with the capability to access information about
+// administrator sessions.
 func NewRegisterPageHandler(cfg config.Config, sessions models.SessionModel) RegisterPageHandler {
 	return RegisterPageHandler{
 		cfg,

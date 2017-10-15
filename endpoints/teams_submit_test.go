@@ -63,7 +63,7 @@ func TestSubmitEndpoint(test *testing.T) {
 
 	for i, testCase := range testCases {
 		test.Logf("Running test case #%d\n", i)
-		reqData := TeamSubmitRequest{
+		reqData := teamSubmitRequest{
 			Token: testCase.SubmitToken,
 			Flag:  testCase.FlagToSubmit,
 		}
@@ -75,7 +75,7 @@ func TestSubmitEndpoint(test *testing.T) {
 		if response.StatusCode != testCase.ExpectedStatus {
 			test.Errorf("Expected status %d. Got %d\n", testCase.ExpectedStatus, response.StatusCode)
 		}
-		data := TeamSubmitResponse{}
+		data := teamSubmitResponse{}
 		decoder := json.NewDecoder(response.Body)
 		defer response.Body.Close()
 		err = decoder.Decode(&data)

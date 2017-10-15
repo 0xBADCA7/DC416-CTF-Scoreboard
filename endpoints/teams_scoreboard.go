@@ -16,8 +16,8 @@ type TeamScoreboardHandler struct {
 	teams models.TeamModel
 }
 
-// TeamScoreboardResponse contains the information written to the client.
-type TeamScoreboardResponse struct {
+// teamScoreboardResponse contains the information written to the client.
+type teamScoreboardResponse struct {
 	Error *string      `json:"error"`
 	Teams []SBTeamInfo `json:"teams"`
 }
@@ -44,14 +44,14 @@ func (self TeamScoreboardHandler) ServeHTTP(res http.ResponseWriter, req *http.R
 	if err != nil {
 		fmt.Printf("Error retrieving teams for scoreboard: %v\n", err)
 		errMsg := "Could not retrieve information about teams"
-		encoder.Encode(TeamScoreboardResponse{
+		encoder.Encode(teamScoreboardResponse{
 			Error: &errMsg,
 			Teams: []SBTeamInfo{},
 		})
 		return
 	}
 	sort.Sort(models.TeamByScore(teams))
-	teamInfo := TeamScoreboardResponse{
+	teamInfo := teamScoreboardResponse{
 		Error: nil,
 		Teams: make([]SBTeamInfo, len(teams)),
 	}

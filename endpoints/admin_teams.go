@@ -10,6 +10,7 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
+// AdminTeamsHandler handles requests to submit flags.
 type AdminTeamsHandler struct {
 	cfg         config.Config
 	submissions models.SubmissionModel
@@ -17,11 +18,11 @@ type AdminTeamsHandler struct {
 	sessions    models.SessionModel
 }
 
-type AdminTeamsRequest struct {
+type adminTeamsRequest struct {
 	SessionToken string `json:"session"`
 }
 
-type AdminTeamsResponse struct {
+type adminTeamsResponse struct {
 	Error    *string         `json:"error"`
 	NumFlags int             `json:"numFlags"`
 	Teams    []adminTeamInfo `json:"teams"`
@@ -34,6 +35,8 @@ type adminTeamInfo struct {
 	SubmittedFlags []bool `json:"submittedFlags,omitempty"`
 }
 
+// NewAdminTeamsHandler constructs a new AdminTeamsHandler with capabilities for dealing with submissions,
+// teams, and administrator sessions.
 func NewAdminTeamsHandler(
 	cfg config.Config,
 	submissions models.SubmissionModel,
@@ -48,8 +51,8 @@ func NewAdminTeamsHandler(
 	}
 }
 
-func errResponse(errMsg *string) AdminTeamsResponse {
-	return AdminTeamsResponse{
+func errResponse(errMsg *string) adminTeamsResponse {
+	return adminTeamsResponse{
 		errMsg,
 		0,
 		[]adminTeamInfo{},
@@ -61,7 +64,7 @@ func (self AdminTeamsHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 	encoder := json.NewEncoder(res)
 
 	sessions, found := req.URL.Query()["session"]
-	request := AdminTeamsRequest{}
+	request := adminTeamsRequest{}
 	if !found || len(sessions) == 0 || len(sessions[0]) == 0 {
 		res.WriteHeader(http.StatusBadRequest)
 		errMsg := "Invalid request"
@@ -84,7 +87,7 @@ func (self AdminTeamsHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 		encoder.Encode(errResponse(&errMsg))
 		return
 	}
-	encoder.Encode(AdminTeamsResponse{
+	encoder.Encode(adminTeamsResponse{
 		nil,
 		len(self.cfg.Flags),
 		teams,

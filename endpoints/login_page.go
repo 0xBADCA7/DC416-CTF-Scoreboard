@@ -8,10 +8,12 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/config"
 )
 
+// LoginPageHandler handles requests to retrieve the admin login page.
 type LoginPageHandler struct {
 	cfg config.Config
 }
 
+// NewLoginPageHandler constructs a new LoginPageHandler.
 func NewLoginPageHandler(cfg config.Config) LoginPageHandler {
 	return LoginPageHandler{
 		cfg,

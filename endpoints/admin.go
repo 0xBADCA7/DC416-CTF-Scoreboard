@@ -15,6 +15,7 @@ const adminURL = "/admin"
 const flagFound = "✓ "
 const flagNotFound = " "
 
+// AdminPageHandler handles requests to
 type AdminPageHandler struct {
 	cfg         config.Config
 	submissions models.SubmissionModel
@@ -22,6 +23,7 @@ type AdminPageHandler struct {
 	sessions    models.SessionModel
 }
 
+// NewAdminPageHandler constructs an AdminPageHandler capable of dealing with submissions, teams, and admin sessions.
 func NewAdminPageHandler(
 	cfg config.Config,
 	submissions models.SubmissionModel,

@@ -9,20 +9,23 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
+// MessagesPostHandler handles requests to post new messages.
 type MessagesPostHandler struct {
 	messages models.MessageModel
 	sessions models.SessionModel
 }
 
-type MessagesPostRequest struct {
+type messagesPostRequest struct {
 	SessionToken   string `json:"session"`
 	MessageContent string `json:"content"`
 }
 
-type MessagesPostResponse struct {
+type messagesPostResponse struct {
 	Error *string `json:"error"`
 }
 
+// NewMessagesPostHandler constructs a new MessagesPostHandler with capabilities for working with messages and
+// administrator sessions.
 func NewMessagesPostHandler(messages models.MessageModel, sessions models.SessionModel) MessagesPostHandler {
 	return MessagesPostHandler{
 		messages,
@@ -35,12 +38,12 @@ func (self MessagesPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 	decoder := json.NewDecoder(req.Body)
 	defer req.Body.Close()
 
-	request := MessagesPostRequest{}
+	request := messagesPostRequest{}
 	decodeErr := decoder.Decode(&request)
 	if decodeErr != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		errMsg := "Invalid request."
-		encoder.Encode(MessagesPostResponse{
+		encoder.Encode(messagesPostResponse{
 			&errMsg,
 		})
 		return
@@ -49,7 +52,7 @@ func (self MessagesPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 	if authErr != nil {
 		res.WriteHeader(http.StatusUnauthorized)
 		errMsg := "You are not authorized to do that."
-		encoder.Encode(MessagesPostResponse{
+		encoder.Encode(messagesPostResponse{
 			&errMsg,
 		})
 		return
@@ -59,12 +62,12 @@ func (self MessagesPostHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 	if err != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		errMsg := fmt.Sprintf("Error saving new message: %s\n", err.Error())
-		encoder.Encode(MessagesPostResponse{
+		encoder.Encode(messagesPostResponse{
 			&errMsg,
 		})
 		return
 	}
-	encoder.Encode(MessagesPostResponse{
+	encoder.Encode(messagesPostResponse{
 		nil,
 	})
 }

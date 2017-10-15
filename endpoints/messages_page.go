@@ -8,10 +8,12 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/config"
 )
 
+// MessagePageHandler handles requests to view the messages page.
 type MessagePageHandler struct {
 	cfg config.Config
 }
 
+// NewMessagePageHandler constructs a new MessagePageHandler.
 func NewMessagePageHandler(cfg config.Config) MessagePageHandler {
 	return MessagePageHandler{
 		cfg,

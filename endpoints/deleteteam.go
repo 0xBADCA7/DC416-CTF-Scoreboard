@@ -9,11 +9,13 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
+// DeleteTeamHandler handles requests to have teams deleted by administrators.
 type DeleteTeamHandler struct {
 	teams    models.TeamModel
 	sessions models.SessionModel
 }
 
+// NewDeleteTeamHandler constructs a DeleteTeamHandler with capabilities for managing teams and admin sessions.
 func NewDeleteTeamHandler(teams models.TeamModel, sessions models.SessionModel) DeleteTeamHandler {
 	return DeleteTeamHandler{
 		teams,

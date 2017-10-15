@@ -10,23 +10,26 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
+// TeamSubmitHandler handles requests made by teams to submit new flags.
 type TeamSubmitHandler struct {
 	teams       models.TeamModel
 	submissions models.SubmissionModel
 	flags       []config.Flag
 }
 
-type TeamSubmitRequest struct {
+type teamSubmitRequest struct {
 	Token string `json:"token"`
 	Flag  string `json:"flag"`
 }
 
-type TeamSubmitResponse struct {
+type teamSubmitResponse struct {
 	Error     *string `json:"error"`
 	IsCorrect bool    `json:"correct"`
 	NewScore  int     `json:"newScore"`
 }
 
+// NewTeamSubmitHandler constructs a new TeamSubmitHandler with capabilities to manage information about teams and
+// submissions.
 func NewTeamSubmitHandler(teams models.TeamModel, submissions models.SubmissionModel, flags []config.Flag) TeamSubmitHandler {
 	return TeamSubmitHandler{
 		teams,
@@ -39,13 +42,13 @@ func (self TeamSubmitHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 	res.Header().Set("Content-Type", "application/json")
 	encoder := json.NewEncoder(res)
 	decoder := json.NewDecoder(req.Body)
-	request := TeamSubmitRequest{}
+	request := teamSubmitRequest{}
 	defer req.Body.Close()
 	err := decoder.Decode(&request)
 	if err != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		errMsg := fmt.Sprintf("Error submitting flag: %v\n", err)
-		encoder.Encode(TeamSubmitResponse{
+		encoder.Encode(teamSubmitResponse{
 			Error:     &errMsg,
 			IsCorrect: false,
 			NewScore:  0,
@@ -56,7 +59,7 @@ func (self TeamSubmitHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 	if err != nil {
 		res.WriteHeader(http.StatusForbidden)
 		errMsg := "Invalid submission token"
-		encoder.Encode(TeamSubmitResponse{
+		encoder.Encode(teamSubmitResponse{
 			Error:     &errMsg,
 			IsCorrect: false,
 			NewScore:  0,
@@ -75,7 +78,7 @@ func (self TeamSubmitHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 	if !found {
 		res.WriteHeader(http.StatusBadRequest)
 		errMsg := "The flag you submitted is not correct."
-		encoder.Encode(TeamSubmitResponse{
+		encoder.Encode(teamSubmitResponse{
 			Error:     &errMsg,
 			IsCorrect: false,
 			NewScore:  team.Score,
@@ -92,7 +95,7 @@ func (self TeamSubmitHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 	if saveErr != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		errMsg := "Failed to save submission."
-		encoder.Encode(TeamSubmitResponse{
+		encoder.Encode(teamSubmitResponse{
 			Error:     &errMsg,
 			IsCorrect: true,
 			NewScore:  team.Score,
@@ -105,14 +108,14 @@ func (self TeamSubmitHandler) ServeHTTP(res http.ResponseWriter, req *http.Reque
 	if updateErr != nil {
 		res.WriteHeader(http.StatusInternalServerError)
 		errMsg := "Internal error; failed to update your score. Please contact an administrator."
-		encoder.Encode(TeamSubmitResponse{
+		encoder.Encode(teamSubmitResponse{
 			Error:     &errMsg,
 			IsCorrect: true,
 			NewScore:  team.Score - flag.Reward,
 		})
 		return
 	}
-	encoder.Encode(TeamSubmitResponse{
+	encoder.Encode(teamSubmitResponse{
 		Error:     nil,
 		IsCorrect: true,
 		NewScore:  team.Score,

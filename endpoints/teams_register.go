@@ -9,22 +9,25 @@ import (
 	"github.com/DC416/DC416-CTF-Scoreboard/models"
 )
 
+// RegisterTeamHandler handles requests to register new teams.
 type RegisterTeamHandler struct {
 	teams    models.TeamModel
 	sessions models.SessionModel
 }
 
-type RegisterTeamRequest struct {
+type registerTeamRequest struct {
 	SessionToken string `json:"session"`
 	TeamName     string `json:"name"`
 	TeamMembers  string `json:"members"`
 }
 
-type RegisterTeamResponse struct {
+type registerTeamResponse struct {
 	Error       *string `json:"error"`
 	SubmitToken string  `json:"submitToken"`
 }
 
+// NewRegisterTeamHandler constructs a RegisterTeamHandler with the capabilities to manage teams and access
+// information about administrator sessions.
 func NewRegisterTeamHandler(teams models.TeamModel, sessions models.SessionModel) RegisterTeamHandler {
 	return RegisterTeamHandler{
 		teams,
@@ -38,12 +41,12 @@ func (self RegisterTeamHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 	decoder := json.NewDecoder(req.Body)
 	defer req.Body.Close()
 
-	request := RegisterTeamRequest{}
+	request := registerTeamRequest{}
 	decodeErr := decoder.Decode(&request)
 	if decodeErr != nil {
 		res.WriteHeader(http.StatusBadRequest)
 		errMsg := "Invalid request."
-		encoder.Encode(RegisterTeamResponse{
+		encoder.Encode(registerTeamResponse{
 			&errMsg,
 			"",
 		})
@@ -53,7 +56,7 @@ func (self RegisterTeamHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 	if authErr != nil {
 		res.WriteHeader(http.StatusUnauthorized)
 		errMsg := "You are not authorized to do that."
-		encoder.Encode(RegisterTeamResponse{
+		encoder.Encode(registerTeamResponse{
 			&errMsg,
 			"",
 		})
@@ -67,13 +70,13 @@ func (self RegisterTeamHandler) ServeHTTP(res http.ResponseWriter, req *http.Req
 		res.WriteHeader(http.StatusInternalServerError)
 		fmt.Printf("Error saving team: %s\n", err.Error())
 		errMsg := "Error saving team."
-		encoder.Encode(RegisterTeamResponse{
+		encoder.Encode(registerTeamResponse{
 			&errMsg,
 			"",
 		})
 		return
 	}
-	encoder.Encode(RegisterTeamResponse{
+	encoder.Encode(registerTeamResponse{
 		nil,
 		team.SubmitToken,
 	})
