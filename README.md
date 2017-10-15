@@ -108,7 +108,7 @@ In order to enable access to the admin page, you can specify a password used to 
 hashed by the application and overwritten.
 
 ```
-CTF_PASSWORD=S3cur3_P4ssw()rd ./IVScoreboard
+CTF_PASSWORD=Adm1nPass ./DC416-CTF-Scoreboard
 ```
 
 Now after logging in, you should be able to visit the `/admin` page.
