@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>ctf scoreboard</title>
+    </head>
+    <body>
+        <div id="main">
+        </div>
+        <script src="js/user.js"></script>
+        <script>
+            const node = document.getElementById('main')
+            console.log('Got main node', node)
+            const elm = Elm.Main.embed(node)
+        </script>
+    </body>
+</html>

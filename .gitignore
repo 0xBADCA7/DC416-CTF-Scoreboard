@@ -1,38 +1,7 @@
-# Elm-stuff
+# Output from and packages for Elm.
+dist/
 elm-stuff/
-main.js
 
-# Compiled Object files, Static and Dynamic libs (Shared Objects)
-*.o
-*.a
-*.so
-
-# Compiled binary
-main
-DC416-CTF-Scoreboard
-
-# Database file
-scoreboard.db
-
-# Folders
-_obj
-_test
-
-# Architecture specific extensions/prefixes
-*.[568vq]
-[568vq].out
-
-*.cgo1.go
-*.cgo2.c
-_cgo_defun.c
-_cgo_gotypes.go
-_cgo_export.*
-
-_testmain.go
-
-*.exe
-*.test
-*.prof
-
-# Vim's temp files
-*.swp
+# Server Node.js stuff.
+node_modules/
+package-lock.json
