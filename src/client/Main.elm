@@ -1,6 +1,14 @@
 module Main exposing (main)
 
+-- Standard imports
+
 import Html exposing (..)
+import Html.Attributes exposing (..)
+
+
+-- Local imports
+
+import Mode.Scoreboard as Scoreboard exposing (Scoreboard(..))
 
 
 -- MAIN
@@ -25,42 +33,32 @@ type alias Date =
 
 
 type ViewMode
-    = ScoreboardView
+    = ScoreboardView Scoreboard
     | FormView
     | MessagesView
 
 
-type alias Team =
-    { name : String
-    , rank : Int
-    , score : Int
-    , lastSubmitted : Date
-    }
-
-
-type alias Scoreboard =
-    List Team
-
-
-type Message
-    = Message Date String
-
-
 type alias Model =
     { mode : ViewMode
-    , scoreboard : Scoreboard
-    , messages : List Message
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model ScoreboardView emptyScoreboard [], Cmd.none )
+    ( Model (ScoreboardView testScoreboard), Cmd.none )
 
 
-emptyScoreboard : Scoreboard
-emptyScoreboard =
-    []
+testScoreboard : Scoreboard
+testScoreboard =
+    Scoreboard
+        [ { rank = 1, name = "Team one", score = 150, lastSubmission = "9:30" }
+        , { rank = 2, name = "H4xx0R", score = 132, lastSubmission = "9:25" }
+        , { rank = 3, name = "31337", score = 130, lastSubmission = "9:46" }
+        , { rank = 4, name = "b4d455", score = 80, lastSubmission = "9:15" }
+        , { rank = 5, name = "CTF TO", score = 68, lastSubmission = "9:08" }
+        , { rank = 6, name = "T.", score = 35, lastSubmission = "8:12" }
+        , { rank = 7, name = "DC416", score = 10, lastSubmission = "7:50" }
+        ]
 
 
 
@@ -94,5 +92,21 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div []
-        [ p [] [ text "Hello, World!" ]
+        [ ul [ class "horizontal buttonList" ]
+            [ li [] [ a [ class "btn btnPrimary waves-effect waves-light" ] [ text "Submit" ] ]
+            , li [] [ a [ class "btn btnSecondary waves-effect waves-light" ] [ text "Messages" ] ]
+            , li [ style [ ( "float", "right" ) ] ] [ a [ class "btn btnSecondary waves-effect waves-light" ] [ text "Admin" ] ]
+            ]
+        , viewMode model.mode
         ]
+
+
+viewMode : ViewMode -> Html Msg
+viewMode mode =
+    div [] <|
+        case mode of
+            ScoreboardView scoreboard ->
+                [ Scoreboard.view scoreboard ]
+
+            _ ->
+                []
