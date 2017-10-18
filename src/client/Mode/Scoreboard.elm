@@ -20,7 +20,7 @@ view : Scoreboard -> Html msg
 view (Scoreboard teams) =
     table [ id "scoreboard" ] <|
         List.append
-            [ td [ id "scoreboardHeader" ]
+            [ tr [ id "scoreboardHeader" ]
                 [ th [] [ text "Rank" ]
                 , th [] [ text "Name" ]
                 , th [] [ text "Score" ]

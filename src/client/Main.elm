@@ -32,20 +32,19 @@ type alias Date =
     String
 
 
-type ViewMode
+type FormKind
+    = SubmitForm
+
+
+type Model
     = ScoreboardView Scoreboard
-    | FormView
+    | FormView FormKind
     | MessagesView
-
-
-type alias Model =
-    { mode : ViewMode
-    }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (ScoreboardView testScoreboard), Cmd.none )
+    ( ScoreboardView testScoreboard, Cmd.none )
 
 
 testScoreboard : Scoreboard
@@ -66,14 +65,14 @@ testScoreboard =
 
 
 type Msg
-    = SwitchMode ViewMode
+    = SwitchMode Model
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SwitchMode mode ->
-            ( { model | mode = mode }, Cmd.none )
+        SwitchMode model ->
+            ( model, Cmd.none )
 
 
 
@@ -92,21 +91,57 @@ subscriptions model =
 view : Model -> Html Msg
 view model =
     div []
-        [ ul [ class "horizontal buttonList" ]
-            [ li [] [ a [ class "btn btnPrimary waves-effect waves-light" ] [ text "Submit" ] ]
-            , li [] [ a [ class "btn btnSecondary waves-effect waves-light" ] [ text "Messages" ] ]
-            , li [ style [ ( "float", "right" ) ] ] [ a [ class "btn btnSecondary waves-effect waves-light" ] [ text "Admin" ] ]
-            ]
-        , viewMode model.mode
+        [ viewNav model
+        , viewMode model
         ]
 
 
-viewMode : ViewMode -> Html Msg
-viewMode mode =
-    div [] <|
-        case mode of
-            ScoreboardView scoreboard ->
-                [ Scoreboard.view scoreboard ]
+viewNav : Model -> Html Msg
+viewNav model =
+    let
+        navLinks =
+            case model of
+                ScoreboardView _ ->
+                    [ li [ class "active" ] [ a [ href "#" ] [ text "Scoreboard" ] ]
+                    , li [] [ a [ href "#" ] [ text "Messages" ] ]
+                    , li [] [ a [ href "#" ] [ text "Submit" ] ]
+                    ]
 
-            _ ->
-                []
+                FormView _ ->
+                    [ li [] [ a [ href "#" ] [ text "Scoreboard" ] ]
+                    , li [ class "active" ] [ a [ href "#" ] [ text "Messages" ] ]
+                    , li [] [ a [ href "#" ] [ text "Submit" ] ]
+                    ]
+
+                MessagesView ->
+                    [ li [] [ a [ href "#" ] [ text "Scoreboard" ] ]
+                    , li [] [ a [ href "#" ] [ text "Messages" ] ]
+                    , li [ class "active" ] [ a [ href "#" ] [ text "Submit" ] ]
+                    ]
+    in
+        nav []
+            [ div [ class "mainContent nav-wrapper" ]
+                [ a [ href "#", class "brand-logo" ] [ text "Scoreboard" ]
+                , ul [ id "nav-mobile", class "right" ] navLinks
+                ]
+            ]
+
+
+viewMode : Model -> Html Msg
+viewMode model =
+    let
+        viewContent =
+            case model of
+                ScoreboardView scoreboard ->
+                    [ span [ class "card-title gray-text text-darken-4" ] [ text "Scoreboard" ]
+                    , Scoreboard.view scoreboard
+                    ]
+
+                _ ->
+                    []
+    in
+        div [ class "mainContent" ]
+            [ div [ id "content", class "card large waves-effect waves-light" ]
+                [ div [ class "card-content" ] viewContent
+                ]
+            ]
