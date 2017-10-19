@@ -29,19 +29,24 @@ main =
 -- MODEL
 
 
-type alias Date =
-    String
-
-
-type Model
-    = ScoreboardView Scoreboard
+type ViewMode
+    = ScoreboardView
     | SubmitForm
     | MessagesView
 
 
+type alias Model =
+    { scoreboard : Scoreboard
+    , submissionToken : String
+    , submissionFlag : String
+    , messages : List String
+    , mode : ViewMode
+    }
+
+
 init : ( Model, Cmd Msg )
 init =
-    ( ScoreboardView testScoreboard, Cmd.none )
+    ( Model testScoreboard "" "" [] ScoreboardView, Cmd.none )
 
 
 testScoreboard : Scoreboard
@@ -62,14 +67,14 @@ testScoreboard =
 
 
 type Msg
-    = SwitchMode Model
+    = SwitchMode ViewMode
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
-        SwitchMode model ->
-            ( model, Cmd.none )
+        SwitchMode mode ->
+            ( { model | mode = mode }, Cmd.none )
 
 
 
@@ -97,21 +102,21 @@ viewNav : Model -> Html Msg
 viewNav model =
     let
         navLinks =
-            case model of
-                ScoreboardView _ ->
-                    [ li [ class "active" ] [ a [ href "#" ] [ text "Scoreboard" ] ]
+            case model.mode of
+                ScoreboardView ->
+                    [ li [ class "active" ] [ a [ href "#", onClick (SwitchMode ScoreboardView) ] [ text "Scoreboard" ] ]
                     , li [] [ a [ href "#", onClick (SwitchMode SubmitForm) ] [ text "Messages" ] ]
                     , li [] [ a [ href "#" ] [ text "Submit" ] ]
                     ]
 
                 SubmitForm ->
-                    [ li [] [ a [ href "#" ] [ text "Scoreboard" ] ]
+                    [ li [] [ a [ href "#", onClick (SwitchMode ScoreboardView) ] [ text "Scoreboard" ] ]
                     , li [ class "active", onClick (SwitchMode SubmitForm) ] [ a [ href "#" ] [ text "Messages" ] ]
                     , li [] [ a [ href "#" ] [ text "Submit" ] ]
                     ]
 
                 MessagesView ->
-                    [ li [] [ a [ href "#" ] [ text "Scoreboard" ] ]
+                    [ li [] [ a [ href "#", onClick (SwitchMode ScoreboardView) ] [ text "Scoreboard" ] ]
                     , li [] [ a [ href "#", onClick (SwitchMode SubmitForm) ] [ text "Messages" ] ]
                     , li [ class "active" ] [ a [ href "#" ] [ text "Submit" ] ]
                     ]
@@ -128,15 +133,15 @@ viewMode : Model -> Html Msg
 viewMode model =
     let
         viewContent =
-            case model of
-                ScoreboardView scoreboard ->
+            case model.mode of
+                ScoreboardView ->
                     [ span [ class "card-title gray-text text-darken-4" ] [ text "Scoreboard" ]
-                    , Scoreboard.view scoreboard
+                    , Scoreboard.view model.scoreboard
                     ]
 
                 SubmitForm ->
                     [ span [ class "card-title gray-text text-darken-4" ] [ text "Submit a flag" ]
-                    , viewSubmitForm <| SwitchMode (ScoreboardView testScoreboard)
+                    , viewSubmitForm <| SwitchMode ScoreboardView
                     ]
 
                 _ ->
