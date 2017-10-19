@@ -4,6 +4,7 @@ module Main exposing (main)
 
 import Html exposing (..)
 import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 
 -- Local imports
@@ -32,13 +33,9 @@ type alias Date =
     String
 
 
-type FormKind
-    = SubmitForm
-
-
 type Model
     = ScoreboardView Scoreboard
-    | FormView FormKind
+    | SubmitForm
     | MessagesView
 
 
@@ -103,19 +100,19 @@ viewNav model =
             case model of
                 ScoreboardView _ ->
                     [ li [ class "active" ] [ a [ href "#" ] [ text "Scoreboard" ] ]
-                    , li [] [ a [ href "#" ] [ text "Messages" ] ]
+                    , li [] [ a [ href "#", onClick (SwitchMode SubmitForm) ] [ text "Messages" ] ]
                     , li [] [ a [ href "#" ] [ text "Submit" ] ]
                     ]
 
-                FormView _ ->
+                SubmitForm ->
                     [ li [] [ a [ href "#" ] [ text "Scoreboard" ] ]
-                    , li [ class "active" ] [ a [ href "#" ] [ text "Messages" ] ]
+                    , li [ class "active", onClick (SwitchMode SubmitForm) ] [ a [ href "#" ] [ text "Messages" ] ]
                     , li [] [ a [ href "#" ] [ text "Submit" ] ]
                     ]
 
                 MessagesView ->
                     [ li [] [ a [ href "#" ] [ text "Scoreboard" ] ]
-                    , li [] [ a [ href "#" ] [ text "Messages" ] ]
+                    , li [] [ a [ href "#", onClick (SwitchMode SubmitForm) ] [ text "Messages" ] ]
                     , li [ class "active" ] [ a [ href "#" ] [ text "Submit" ] ]
                     ]
     in
@@ -137,6 +134,11 @@ viewMode model =
                     , Scoreboard.view scoreboard
                     ]
 
+                SubmitForm ->
+                    [ span [ class "card-title gray-text text-darken-4" ] [ text "Submit a flag" ]
+                    , viewSubmitForm <| SwitchMode (ScoreboardView testScoreboard)
+                    ]
+
                 _ ->
                     []
     in
@@ -145,3 +147,32 @@ viewMode model =
                 [ div [ class "card-content" ] viewContent
                 ]
             ]
+
+
+viewSubmitForm : Msg -> Html Msg
+viewSubmitForm msg =
+    div [ class "row" ]
+        [ Html.form [ id "submitFlagForm", class "col s12" ]
+            [ div [ class "row" ]
+                [ div [ class "input-field col s12" ]
+                    [ input
+                        [ id "submissionTokenField"
+                        , type_ "text"
+                        , placeholder "submission token"
+                        ]
+                        []
+                    ]
+                ]
+            , div [ class "row" ]
+                [ div [ class "input-field col s12" ]
+                    [ input
+                        [ id "submissionFlagField"
+                        , type_ "text"
+                        , placeholder "flag"
+                        ]
+                        []
+                    ]
+                ]
+            , a [ id "submitFlagBtn", class "btn btnPrimary" ] [ text "submit" ]
+            ]
+        ]
