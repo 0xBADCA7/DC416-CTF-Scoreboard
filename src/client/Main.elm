@@ -105,20 +105,20 @@ viewNav model =
             case model.mode of
                 ScoreboardView ->
                     [ li [ class "active" ] [ a [ href "#", onClick (SwitchMode ScoreboardView) ] [ text "Scoreboard" ] ]
-                    , li [] [ a [ href "#", onClick (SwitchMode SubmitForm) ] [ text "Messages" ] ]
-                    , li [] [ a [ href "#" ] [ text "Submit" ] ]
+                    , li [] [ a [ href "#", onClick (SwitchMode MessagesView) ] [ text "Messages" ] ]
+                    , li [] [ a [ href "#", onClick (SwitchMode SubmitForm) ] [ text "Submit" ] ]
                     ]
 
                 SubmitForm ->
                     [ li [] [ a [ href "#", onClick (SwitchMode ScoreboardView) ] [ text "Scoreboard" ] ]
-                    , li [ class "active", onClick (SwitchMode SubmitForm) ] [ a [ href "#" ] [ text "Messages" ] ]
-                    , li [] [ a [ href "#" ] [ text "Submit" ] ]
+                    , li [ class "active" ] [ a [ href "#", onClick (SwitchMode MessagesView) ] [ text "Messages" ] ]
+                    , li [] [ a [ href "#", onClick (SwitchMode SubmitForm) ] [ text "Submit" ] ]
                     ]
 
                 MessagesView ->
                     [ li [] [ a [ href "#", onClick (SwitchMode ScoreboardView) ] [ text "Scoreboard" ] ]
-                    , li [] [ a [ href "#", onClick (SwitchMode SubmitForm) ] [ text "Messages" ] ]
-                    , li [ class "active" ] [ a [ href "#" ] [ text "Submit" ] ]
+                    , li [] [ a [ href "#", onClick (SwitchMode MessagesView) ] [ text "Messages" ] ]
+                    , li [ class "active" ] [ a [ href "#", onClick (SwitchMode SubmitForm) ] [ text "Submit" ] ]
                     ]
     in
         nav []
