@@ -1,0 +1,94 @@
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+nav {
+    margin-bottom: 35px;
+    background-color: #284490 !important;
+    /*background-color: #607D8B !important;*/
+}
+
+table {
+    width: 100% !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+th {
+    font-weight: 400;
+    color: rgb(161, 161, 161);
+}
+
+tr, th, td {
+    text-align: center !important;
+}
+
+td, th, p, a, label, input {
+    font-size: 1.2em !important;
+}
+
+label {
+    margin-bottom: 10px !important;
+}
+
+#content {
+    width: 100%;
+}
+
+tr#scoreboardHeader {
+    border-bottom: 1px solid rgb(128, 128, 128);
+}
+
+.brand-logo {
+    font-size: 1.5em !important;
+}
+
+.card {
+    height: inherit !important;
+}
+
+.mainContent {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+a.btn {
+    width: 142px !important;
+    height: 42px !important;
+    text-align: center;
+    padding-top: 2px;
+}
+
+a.btnPrimary {
+    background-color: #4CAF50 !important;
+}
+
+a.btnSecondary {
+    background-color: #2196F3 !important;
+    /*background-color: #FF5722 !important;*/
+}
+
+ul.buttonList.horizontal li {
+    margin-right: 4px;
+    display: inline;
+}
+
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: rgb(134, 134, 134) !important;  
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color: rgb(134, 134, 134) !important;
+   opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color: rgb(134, 134, 134) !important;
+   opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+   color: rgb(134, 134, 134) !important;      
+}
+::-ms-input-placeholder { /* Microsoft Edge */
+   color: rgb(134, 134, 134) !important;
+}
