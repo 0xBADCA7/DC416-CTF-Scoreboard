@@ -35,18 +35,34 @@ type ViewMode
     | MessagesView
 
 
+type alias Message =
+    { posted : String
+    , content : String
+    }
+
+
 type alias Model =
     { scoreboard : Scoreboard
     , submissionToken : String
     , submissionFlag : String
-    , messages : List String
+    , messages : List Message
     , mode : ViewMode
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model testScoreboard "" "" [] ScoreboardView, Cmd.none )
+    let
+        scoreboard =
+            testScoreboard
+
+        messages =
+            [ { posted = "October 15 at 9:30 AM", content = "Registrations are open!" }
+            , { posted = "October 18 at 4:30 PM", content = "We will be posting some more information about the style of CTF soon." }
+            , { posted = "October 21 at 5:00 PM", content = "The challenges are all available now! Good luck, everyone!" }
+            ]
+    in
+        ( Model scoreboard "" "" messages ScoreboardView, Cmd.none )
 
 
 testScoreboard : Scoreboard
@@ -141,11 +157,13 @@ viewMode model =
 
                 SubmitForm ->
                     [ span [ class "card-title gray-text text-darken-4" ] [ text "Submit a flag" ]
-                    , viewSubmitForm <| SwitchMode ScoreboardView
+                    , viewSubmitForm
                     ]
 
-                _ ->
-                    []
+                MessagesView ->
+                    [ span [ class "card-title gray-text text-darken-4" ] [ text "Messages" ]
+                    , viewMessages model
+                    ]
     in
         div [ class "mainContent" ]
             [ div [ id "content", class "card large waves-effect waves-light" ]
@@ -154,8 +172,8 @@ viewMode model =
             ]
 
 
-viewSubmitForm : Msg -> Html Msg
-viewSubmitForm msg =
+viewSubmitForm : Html Msg
+viewSubmitForm =
     div [ class "row" ]
         [ Html.form [ id "submitFlagForm", class "col s12" ]
             [ div [ class "row" ]
@@ -180,4 +198,17 @@ viewSubmitForm msg =
                 ]
             , a [ id "submitFlagBtn", class "btn btnPrimary" ] [ text "submit" ]
             ]
+        ]
+
+
+viewMessages : Model -> Html Msg
+viewMessages model =
+    ul [ id "messageList", style [ ( "list-style", "none" ) ] ] <| List.map viewMessage <| List.reverse model.messages
+
+
+viewMessage : Message -> Html Msg
+viewMessage { posted, content } =
+    li [ class "adminMessage" ]
+        [ span [ class "gray-text text-darken-4" ] [ text ("Posted " ++ posted) ]
+        , p [] [ text content ]
         ]
