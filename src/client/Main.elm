@@ -11,6 +11,7 @@ import Html.Events exposing (..)
 
 import Mode.Scoreboard as Scoreboard exposing (Scoreboard(..))
 import Mode.Message as Message exposing (Message)
+import Mode.SubmitForm as SubmitForm
 
 
 -- MAIN
@@ -152,7 +153,7 @@ viewMode model =
 
                 SubmitForm ->
                     [ span [ class "card-title gray-text text-darken-4" ] [ text "Submit a flag" ]
-                    , viewSubmitForm
+                    , SubmitForm.view
                     ]
 
                 MessagesView ->
@@ -165,32 +166,3 @@ viewMode model =
                 [ div [ class "card-content" ] viewContent
                 ]
             ]
-
-
-viewSubmitForm : Html Msg
-viewSubmitForm =
-    div [ class "row" ]
-        [ Html.form [ id "submitFlagForm", class "col s12" ]
-            [ div [ class "row" ]
-                [ div [ class "input-field col s12" ]
-                    [ input
-                        [ id "submissionTokenField"
-                        , type_ "text"
-                        , placeholder "submission token"
-                        ]
-                        []
-                    ]
-                ]
-            , div [ class "row" ]
-                [ div [ class "input-field col s12" ]
-                    [ input
-                        [ id "submissionFlagField"
-                        , type_ "text"
-                        , placeholder "flag"
-                        ]
-                        []
-                    ]
-                ]
-            , a [ id "submitFlagBtn", class "btn btnPrimary" ] [ text "submit" ]
-            ]
-        ]
