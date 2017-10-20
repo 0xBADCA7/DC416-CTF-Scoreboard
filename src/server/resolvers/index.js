@@ -62,6 +62,12 @@ const resolvers = {
   Query: {
     teams: () => testTeams,
     messages: () => testMessages,
+  },
+  Mutation: {
+    submitFlag: () => {
+      console.log('Got a request to submit a flag.')
+      return testTeams
+    }
   }
 }
 

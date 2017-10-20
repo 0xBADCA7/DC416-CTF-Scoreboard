@@ -3,6 +3,10 @@ type Query {
     messages: [Message]
 }
 
+type Mutation {
+    submitFlag(submissionToken: String!, flag: String!): [Team]!
+}
+
 type Team {
     rank: Int
     name: String
