@@ -1,5 +1,6 @@
 type Query {
     teams: [Team]
+    messages: [Message]
 }
 
 type Team {
@@ -7,4 +8,9 @@ type Team {
     name: String
     score: Int
     lastSubmission: String
+}
+
+type Message {
+    posted: String
+    content: String
 }
