@@ -10,6 +10,7 @@ import Html.Events exposing (..)
 -- Local imports
 
 import Mode.Scoreboard as Scoreboard exposing (Scoreboard(..))
+import Mode.Message as Message exposing (Message)
 
 
 -- MAIN
@@ -33,12 +34,6 @@ type ViewMode
     = ScoreboardView
     | SubmitForm
     | MessagesView
-
-
-type alias Message =
-    { posted : String
-    , content : String
-    }
 
 
 type alias Model =
@@ -162,7 +157,7 @@ viewMode model =
 
                 MessagesView ->
                     [ span [ class "card-title gray-text text-darken-4" ] [ text "Messages" ]
-                    , viewMessages model
+                    , Message.view model.messages
                     ]
     in
         div [ class "mainContent" ]
@@ -198,17 +193,4 @@ viewSubmitForm =
                 ]
             , a [ id "submitFlagBtn", class "btn btnPrimary" ] [ text "submit" ]
             ]
-        ]
-
-
-viewMessages : Model -> Html Msg
-viewMessages model =
-    ul [ id "messageList", style [ ( "list-style", "none" ) ] ] <| List.map viewMessage <| List.reverse model.messages
-
-
-viewMessage : Message -> Html Msg
-viewMessage { posted, content } =
-    li [ class "adminMessage" ]
-        [ span [ class "gray-text text-darken-4" ] [ text ("Posted " ++ posted) ]
-        , p [] [ text content ]
         ]
