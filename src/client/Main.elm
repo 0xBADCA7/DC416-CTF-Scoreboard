@@ -59,18 +59,31 @@ init =
 type Msg
     = SwitchMode ViewMode
     | ScoreboardRetrieved (Result Http.Error Scoreboard)
+    | MessagesRetrieved (Result Http.Error (List Message))
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
+        SwitchMode ScoreboardView ->
+            ( { model | mode = ScoreboardView }, Scoreboard.query ScoreboardRetrieved )
+
+        SwitchMode MessagesView ->
+            ( { model | mode = MessagesView }, Message.query MessagesRetrieved )
+
         SwitchMode mode ->
             ( { model | mode = mode }, Cmd.none )
 
         ScoreboardRetrieved (Ok scoreboard) ->
-            ( { model | scoreboard = Debug.log "Scoreboard" scoreboard }, Cmd.none )
+            ( { model | scoreboard = scoreboard }, Cmd.none )
 
-        ScoreboardRetrieved (Err err) ->
+        ScoreboardRetrieved _ ->
+            ( model, Cmd.none )
+
+        MessagesRetrieved (Ok messages) ->
+            ( { model | messages = messages }, Cmd.none )
+
+        MessagesRetrieved (Err err) ->
             let
                 _ =
                     Debug.log "ERROR" err

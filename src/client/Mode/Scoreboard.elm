@@ -10,7 +10,7 @@ import Json.Decode as Decode exposing (Decoder, field, maybe, int, string, list)
 
 -- Third-party packages
 
-import GraphQl exposing (Operation, Query, Named, Variables)
+import GraphQl exposing (Operation, Query, Named)
 
 
 -- MODEL
