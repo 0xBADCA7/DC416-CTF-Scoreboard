@@ -5,7 +5,7 @@ module Mode.Scoreboard exposing (Scoreboard(..), view, query)
 import Http
 import Html exposing (..)
 import Html.Attributes exposing (id)
-import Json.Decode as Decode exposing (Decoder, field, maybe, int, string, list)
+import Json.Decode as Decode exposing (Decoder, field, int, string, list)
 
 
 -- Third-party packages
