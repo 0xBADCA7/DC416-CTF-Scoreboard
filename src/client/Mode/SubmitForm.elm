@@ -1,4 +1,4 @@
-module Mode.SubmitForm exposing (Input(..), view, mutation)
+module Mode.SubmitForm exposing (Input(..), SubmitResponse, view, mutation)
 
 -- Core packages
 
@@ -6,7 +6,7 @@ import Http
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (onInput, onClick)
-import Json.Decode as Decode exposing (Decoder, field, int, string, list)
+import Json.Decode as Decode exposing (Decoder, field, int, string, list, bool, maybe)
 
 
 -- Third-party packages
@@ -16,6 +16,7 @@ import GraphQl exposing (Operation, Mutation, Named)
 
 -- Local packages
 
+import Msg exposing (Msg)
 import Mode.Scoreboard exposing (Scoreboard, scoreboard)
 
 
@@ -68,6 +69,21 @@ view msg =
 -- QUERY
 
 
+type alias SubmitResponse =
+    { correct : Bool
+    , newScore : Maybe Int
+    , scoreboard : Scoreboard
+    }
+
+
+submitResponse : Decoder SubmitResponse
+submitResponse =
+    Decode.map3 SubmitResponse
+        (field "correct" bool)
+        (maybe (field "newScore" int))
+        (field "teams" scoreboard)
+
+
 submitMutation : String -> String -> Operation Mutation Named
 submitMutation token flag =
     GraphQl.named "SubmitFlagMutation"
@@ -75,19 +91,24 @@ submitMutation token flag =
             |> GraphQl.withArgument "submissionToken" (GraphQl.string token)
             |> GraphQl.withArgument "flag" (GraphQl.string flag)
             |> GraphQl.withSelectors
-                [ GraphQl.field "rank"
-                , GraphQl.field "name"
-                , GraphQl.field "score"
-                , GraphQl.field "lastSubmission"
+                [ GraphQl.field "correct"
+                , GraphQl.field "newScore"
+                , GraphQl.field "teams"
+                    |> GraphQl.withSelectors
+                        [ GraphQl.field "rank"
+                        , GraphQl.field "name"
+                        , GraphQl.field "score"
+                        , GraphQl.field "lastSubmission"
+                        ]
                 ]
         ]
 
 
-submitRequest : Operation Mutation Named -> Decoder Scoreboard -> GraphQl.Request Mutation Named Scoreboard
+submitRequest : Operation Mutation Named -> Decoder SubmitResponse -> GraphQl.Request Mutation Named SubmitResponse
 submitRequest =
     GraphQl.mutation "/graphql"
 
 
-mutation : String -> String -> (Result Http.Error Scoreboard -> msg) -> Cmd msg
+mutation : String -> String -> (Result Http.Error SubmitResponse -> Msg) -> Cmd Msg
 mutation token flag handler =
-    GraphQl.send handler (submitRequest (submitMutation token flag) scoreboard)
+    GraphQl.send handler (submitRequest (submitMutation token flag) submitResponse)

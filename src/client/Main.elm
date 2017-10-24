@@ -10,9 +10,10 @@ import Html.Events exposing (..)
 
 -- Local imports
 
+import Msg exposing (..)
 import Mode.Scoreboard as Scoreboard exposing (Scoreboard(..))
 import Mode.Message as Message exposing (Message)
-import Mode.SubmitForm as SubmitForm
+import Mode.SubmitForm as SubmitForm exposing (SubmitResponse)
 
 
 -- MAIN
@@ -32,10 +33,9 @@ main =
 -- MODEL
 
 
-type ViewMode
-    = ScoreboardView
-    | SubmitForm
-    | MessagesView
+type Notification
+    = Error String
+    | Success String
 
 
 type alias Model =
@@ -44,23 +44,17 @@ type alias Model =
     , flagInput : String
     , messages : List Message
     , mode : ViewMode
+    , notification : Maybe Notification
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (Scoreboard []) "" "" [] ScoreboardView, Scoreboard.query ScoreboardRetrieved )
+    ( Model (Scoreboard []) "" "" [] ScoreboardView Nothing, Scoreboard.query ScoreboardRetrieved )
 
 
 
 -- UPDATE
-
-
-type Msg
-    = SwitchMode ViewMode
-    | ScoreboardRetrieved (Result Http.Error Scoreboard)
-    | MessagesRetrieved (Result Http.Error (List Message))
-    | GotInput SubmitForm.Input
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -98,7 +92,20 @@ update msg model =
             ( { model | flagInput = input }, Cmd.none )
 
         GotInput SubmitForm.Submit ->
-            ( model, SubmitForm.mutation model.submitTokenInput model.flagInput ScoreboardRetrieved )
+            ( model, SubmitForm.mutation model.submitTokenInput model.flagInput FlagSubmitted )
+
+        FlagSubmitted (Err _) ->
+            ( { model | notification = Error "Error submitting flag. Try again later." }, Cmd.none )
+
+        FlagSubmitted (Ok { correct, newScore, scoreboard }) ->
+            let
+                notification =
+                    if correct then
+                        Success ("Congratulations! Your team's score is now" ++ (toString newScore) ++ "!")
+                    else
+                        Error "Your submission was incorrect."
+            in
+                ( { model | notification = notification, scoreboard = scoreboard }, Cmd.none )
 
 
 

@@ -4,7 +4,7 @@ type Query {
 }
 
 type Mutation {
-    submitFlag(submissionToken: String!, flag: String!): [Team]!
+    submitFlag(submissionToken: String!, flag: String!): SubmitFlagResponse
 }
 
 type Team {
@@ -17,4 +17,10 @@ type Team {
 type Message {
     posted: String
     content: String
+}
+
+type SubmitFlagResponse {
+    correct: Bool!
+    newScore: Int
+    scoreboard: [Team]!
 }
