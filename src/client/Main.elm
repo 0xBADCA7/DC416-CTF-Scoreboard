@@ -10,7 +10,6 @@ import Html.Events exposing (..)
 
 -- Local imports
 
-import Msg exposing (..)
 import Mode.Scoreboard as Scoreboard exposing (Scoreboard(..))
 import Mode.Message as Message exposing (Message)
 import Mode.SubmitForm as SubmitForm exposing (SubmitResponse)
@@ -36,6 +35,20 @@ main =
 type Notification
     = Error String
     | Success String
+
+
+type ViewMode
+    = ScoreboardView
+    | SubmitForm
+    | MessagesView
+
+
+type Msg
+    = SwitchMode ViewMode
+    | ScoreboardRetrieved (Result Http.Error Scoreboard)
+    | FlagSubmitted (Result Http.Error SubmitResponse)
+    | MessagesRetrieved (Result Http.Error (List Message))
+    | GotInput SubmitForm.Input
 
 
 type alias Model =

@@ -16,7 +16,6 @@ import GraphQl exposing (Operation, Mutation, Named)
 
 -- Local packages
 
-import Msg exposing (Msg)
 import Mode.Scoreboard exposing (Scoreboard, scoreboard)
 
 
@@ -109,6 +108,6 @@ submitRequest =
     GraphQl.mutation "/graphql"
 
 
-mutation : String -> String -> (Result Http.Error SubmitResponse -> Msg) -> Cmd Msg
+mutation : String -> String -> (Result Http.Error SubmitResponse -> msg) -> Cmd msg
 mutation token flag handler =
     GraphQl.send handler (submitRequest (submitMutation token flag) submitResponse)
