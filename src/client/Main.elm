@@ -40,8 +40,8 @@ type ViewMode
 
 type alias Model =
     { scoreboard : Scoreboard
-    , submissionToken : String
-    , submissionFlag : String
+    , submitTokenInput : String
+    , flagInput : String
     , messages : List Message
     , mode : ViewMode
     }
@@ -60,6 +60,7 @@ type Msg
     = SwitchMode ViewMode
     | ScoreboardRetrieved (Result Http.Error Scoreboard)
     | MessagesRetrieved (Result Http.Error (List Message))
+    | GotInput SubmitForm.Input
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -89,6 +90,15 @@ update msg model =
                     Debug.log "ERROR" err
             in
                 ( model, Cmd.none )
+
+        GotInput (SubmitForm.SubmissionToken input) ->
+            ( { model | submitTokenInput = input }, Cmd.none )
+
+        GotInput (SubmitForm.Flag input) ->
+            ( { model | flagInput = input }, Cmd.none )
+
+        GotInput SubmitForm.Submit ->
+            ( model, SubmitForm.mutation model.submitTokenInput model.flagInput ScoreboardRetrieved )
 
 
 
@@ -155,7 +165,7 @@ viewMode model =
 
                 SubmitForm ->
                     [ span [ class "card-title gray-text text-darken-4" ] [ text "Submit a flag" ]
-                    , SubmitForm.view
+                    , SubmitForm.view GotInput
                     ]
 
                 MessagesView ->

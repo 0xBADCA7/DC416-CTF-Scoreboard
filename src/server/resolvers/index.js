@@ -64,8 +64,8 @@ const resolvers = {
     messages: () => testMessages,
   },
   Mutation: {
-    submitFlag: () => {
-      console.log('Got a request to submit a flag.')
+    submitFlag: (_, args) => {
+      console.log(`Got a request to submit a flag. token = ${args.submissionToken}, flag = ${args.flag}`)
       return testTeams
     }
   }

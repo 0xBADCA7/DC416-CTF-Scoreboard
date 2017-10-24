@@ -1,4 +1,4 @@
-module Mode.Scoreboard exposing (Scoreboard(..), view, query)
+module Mode.Scoreboard exposing (Scoreboard(..), view, query, scoreboard)
 
 -- Core packages
 
