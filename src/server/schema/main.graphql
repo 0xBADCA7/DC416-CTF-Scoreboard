@@ -20,7 +20,7 @@ type Message {
 }
 
 type SubmitFlagResponse {
-    correct: Bool!
+    correct: Boolean!
     newScore: Int
     scoreboard: [Team]!
 }

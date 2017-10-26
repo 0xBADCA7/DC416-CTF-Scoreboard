@@ -108,7 +108,7 @@ update msg model =
             ( model, SubmitForm.mutation model.submitTokenInput model.flagInput FlagSubmitted )
 
         FlagSubmitted (Err _) ->
-            ( { model | notification = Error "Error submitting flag. Try again later." }, Cmd.none )
+            ( { model | notification = Just <| Error "Error submitting flag. Try again later." }, Cmd.none )
 
         FlagSubmitted (Ok { correct, newScore, scoreboard }) ->
             let
@@ -118,7 +118,7 @@ update msg model =
                     else
                         Error "Your submission was incorrect."
             in
-                ( { model | notification = notification, scoreboard = scoreboard }, Cmd.none )
+                ( { model | notification = Just notification, scoreboard = scoreboard }, Cmd.none )
 
 
 
