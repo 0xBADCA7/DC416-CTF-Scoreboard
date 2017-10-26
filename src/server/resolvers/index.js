@@ -1,47 +1,5 @@
-const testTeams = [
-  {
-    rank: 1,
-    name: 'Team one',
-    score: 155,
-    lastSubmission: '5:30 PM',
-  },
-  {
-    rank: 2,
-    name: 'DC416',
-    score: 140,
-    lastSubmission: '4:52 PM',
-  },
-  {
-    rank: 3,
-    name: 'h4xx0rz',
-    score: 135,
-    lastSubmission: '4:04 PM',
-  },
-  {
-    rank: 4,
-    name: '31337',
-    score: 135,
-    lastSubmission: '4:38 PM',
-  },
-  {
-    rank: 5,
-    name: 'grep -i flag',
-    score: 100,
-    lastSubmission: '2:00 PM',
-  },
-  {
-    rank: 6,
-    name: 'First place',
-    score: 25,
-    lastSubmission: '1:13 PM',
-  },
-  {
-    rank: 7,
-    name: 'Lucky #7',
-    score: 0,
-    lastSubmission: 'No submissions yet',
-  },
-]
+const queries = require('../queries')
+
 
 const testMessages = [
   {
@@ -58,16 +16,39 @@ const testMessages = [
   },
 ]
 
+
+const teamScoreCompare = (t1, t2) => {
+  if (t1.score != t2.score) {
+    return t1.score - t2.score
+  }
+  const time1 = new Date(t1.lastSubmission)
+  const time2 = new Date(t2.lastSubmission)
+  return time1.getTime() - time2.getTime()
+}
+
+
 const resolvers = {
   Query: {
-    teams: () => testTeams,
+    teams: (_, __, { db }) => {
+      return queries.teams.all(db)
+        .then(teams => teams.map(team => ({
+          rank: 0,
+          name: team.name,
+          score: team.score,
+        })))
+      },
     messages: () => testMessages,
   },
   Mutation: {
     submitFlag: (_, args) => {
-      console.log(`Got a request to submit a flag. token = ${args.submissionToken}, flag = ${args.flag}`)
-      return testTeams
+      return [] 
     }
+  },
+  Team: {
+    lastSubmission: ({ name }, _, { db }) => {
+      return queries.teams.find(db, { name })
+        .then(team => team.lastSubmission || 'No submissions yet.')
+      }
   }
 }
 
