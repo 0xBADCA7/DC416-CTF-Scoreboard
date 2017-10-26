@@ -1,4 +1,5 @@
 const teams = require('./teams')
+const messages = require('./messages')
 
 const createTeamTableQ = `
 create table if not exists teams (
@@ -34,5 +35,7 @@ const initDB = (db) => {
   db.run(createSubmissionTableQ)
 }
 
+
 exports.initDB = initDB
 exports.teams = teams
+exports.messages = messages
