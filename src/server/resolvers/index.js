@@ -17,7 +17,7 @@ const testMessages = [
 ]
 
 
-const teamScoreCompare = (t1, t2) => {
+const teamSortCompare = (t1, t2) => {
   if (t1.score != t2.score) {
     return t1.score - t2.score
   }
@@ -29,14 +29,14 @@ const teamScoreCompare = (t1, t2) => {
 
 const resolvers = {
   Query: {
-    teams: (_, __, { db }) => {
-      return queries.teams.all(db)
-        .then(teams => teams.map(team => ({
-          rank: 0,
-          name: team.name,
-          score: team.score,
-        })))
-      },
+    teams: async (_, __, { db }) => {
+      const teams = await queries.teams.all(db)
+      teams.sort(teamSortCompare)
+      for (const index in teams) {
+        teams[index].rank = index + 1
+      }
+      return teams
+    },
     messages: (_, __, { db }) => {
       return queries.messages.all(db)
         .then(msgs => msgs.map(msg => ({
