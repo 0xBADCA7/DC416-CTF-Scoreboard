@@ -25,6 +25,12 @@ const start = async () => {
     schema,
     graphiql: true,
     context: { db },
+    formatError: error => ({
+      message: error.message,
+      locations: error.locations,
+      stack: error.stack,
+      path: error.path
+    })
   }))
 
   app.use(express.static('dist'))

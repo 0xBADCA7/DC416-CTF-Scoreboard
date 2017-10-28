@@ -22,7 +22,7 @@ where team_id = (
 
 const create = (db, { team, flag, value }) => {
   return new Promise((resolve, reject) => {
-    db.run(createSubmissionQ, team, flag, value, Date.now(), err => err ? reject(err) : resolve())
+    db.run(createSubmissionQ, team, flag, value, Date.now(), err => err ? reject(err) : resolve(true))
   })
 }
 

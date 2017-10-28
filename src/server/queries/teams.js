@@ -60,35 +60,29 @@ const find = (db, lookupBy) => {
   }
 
   return new Promise((resolve, reject) => {
-    db.get(query, arg, (err, row) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(row)
-      }
-    })
+    db.get(query, arg, (err, row) => err ? reject(err) : resolve(row))
   })
 }
 
 const update = async (db, { id, score }) => {
-  return new Promise((reject, resolve) => {
-    db.run(updateScoreQ, score, id, err => err ? reject(err) : resolve())
+  return new Promise((resolve, reject) => {
+    db.run(updateScoreQ, score, id, err => err ? reject(err) : resolve(true))
   })
 }
 
 const submitFlag = async (db, { token, flag }) => {
   const submitted = flags.find(({ secret }) => secret === flag)
 
-  if (flag === undefined) {
+  if (submitted === undefined) {
     return Promise.reject(new Error('incorrect flag'))
   }
   const { id, score } = await find(db, { token })
-  await submissions.create(db, {
+  const result = await submissions.create(db, {
     team: id,
     flag: submitted.id,
     value: submitted.value
   })
-  return await update(db, { id, score: score + submitted.value })
+  return update(db, { id, score: score + submitted.value })
 }
 
 
