@@ -35,6 +35,7 @@ main =
 type Notification
     = Error String
     | Success String
+    | None
 
 
 type ViewMode
@@ -57,13 +58,13 @@ type alias Model =
     , flagInput : String
     , messages : List Message
     , mode : ViewMode
-    , notification : Maybe Notification
+    , notification : Notification
     }
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (Scoreboard []) "" "" [] ScoreboardView Nothing, Scoreboard.query ScoreboardRetrieved )
+    ( Model (Scoreboard []) "" "" [] ScoreboardView (Success "testing this out"), Scoreboard.query ScoreboardRetrieved )
 
 
 
@@ -74,13 +75,13 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         SwitchMode ScoreboardView ->
-            ( { model | mode = ScoreboardView }, Scoreboard.query ScoreboardRetrieved )
+            ( { model | mode = ScoreboardView, notification = None }, Scoreboard.query ScoreboardRetrieved )
 
         SwitchMode MessagesView ->
-            ( { model | mode = MessagesView }, Message.query MessagesRetrieved )
+            ( { model | mode = MessagesView, notification = None }, Message.query MessagesRetrieved )
 
         SwitchMode mode ->
-            ( { model | mode = mode }, Cmd.none )
+            ( { model | mode = mode, notification = None }, Cmd.none )
 
         ScoreboardRetrieved (Ok scoreboard) ->
             ( { model | scoreboard = scoreboard }, Cmd.none )
@@ -108,7 +109,7 @@ update msg model =
             ( model, SubmitForm.mutation model.submitTokenInput model.flagInput FlagSubmitted )
 
         FlagSubmitted (Err _) ->
-            ( { model | notification = Just <| Error "Error submitting flag. Try again later." }, Cmd.none )
+            ( { model | notification = Error "Error submitting flag. Try again later." }, Cmd.none )
 
         FlagSubmitted (Ok { correct, newScore, scoreboard }) ->
             let
@@ -118,7 +119,7 @@ update msg model =
                     else
                         Error "Your submission was incorrect."
             in
-                ( { model | notification = Just notification, scoreboard = scoreboard }, Cmd.none )
+                ( { model | notification = notification, scoreboard = scoreboard }, Cmd.none )
 
 
 
@@ -138,6 +139,7 @@ view : Model -> Html Msg
 view model =
     div []
         [ viewNav model
+        , viewNotification model
         , viewMode model
         ]
 
@@ -169,6 +171,34 @@ viewNav model =
             [ div [ class "mainContent nav-wrapper" ]
                 [ a [ href "#", class "brand-logo" ] [ text "Scoreboard" ] --img [ src "/img/logo.png" ] [] ]
                 , ul [ id "nav-mobile", class "right" ] navLinks
+                ]
+            ]
+
+
+viewNotification : Model -> Html Msg
+viewNotification model =
+    let
+        ( kind, displayMode, message ) =
+            case model.notification of
+                Error message ->
+                    ( "Error", "visible", message )
+
+                Success message ->
+                    ( "Success", "visible", message )
+
+                None ->
+                    ( "", "none", "" )
+    in
+        div
+            [ id "notification"
+            , class "mainContent"
+            , style [ ( "display", displayMode ) ]
+            ]
+            [ div [ class "card large waves-effect waves-light" ]
+                [ div [ class "card-content" ]
+                    [ span [ class "card-title gray-text text-darken-4" ] [ text kind ]
+                    , p [] [ text message ]
+                    ]
                 ]
             ]
 

@@ -39,10 +39,6 @@ const resolvers = {
     },
     messages: (_, __, { db }) => {
       return queries.messages.all(db)
-        .then(msgs => msgs.map(msg => ({
-          posted: msg.posted,
-          content: msg.content,
-        })))
     }
   },
   Mutation: {
