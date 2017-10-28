@@ -46,8 +46,10 @@ const resolvers = {
     }
   },
   Mutation: {
-    submitFlag: (_, args) => {
-      return [] 
+    submitFlag: async (_, { submissionToken, flag }, { db }) => {
+      const result = await queries.teams.submitFlag(db, submissionToken, flag)
+      console.log('results from submitQuery', result)
+      return []
     }
   },
   Team: {

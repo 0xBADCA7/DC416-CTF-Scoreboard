@@ -167,7 +167,7 @@ viewNav model =
     in
         nav []
             [ div [ class "mainContent nav-wrapper" ]
-                [ a [ href "#", class "brand-logo" ] [ text "Scoreboard" ]
+                [ a [ href "#", class "brand-logo" ] [ text "Scoreboard" ] --img [ src "/img/logo.png" ] [] ]
                 , ul [ id "nav-mobile", class "right" ] navLinks
                 ]
             ]

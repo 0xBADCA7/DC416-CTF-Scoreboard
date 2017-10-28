@@ -1,3 +1,6 @@
+const submissions = require('./submissions')
+const flags = require('../../../config/flags.json')
+
 const allTeamsQ = `
 select id, name, token, score
 from teams;
@@ -15,6 +18,19 @@ from teams
 where name = ?;
 `
 
+const findTeamByTokenQ = `
+select id, name, token, score
+from teams
+where token = ?;
+`
+
+const updateScoreQ =`
+update teams
+set score = ?
+where id = ?;
+`
+
+
 const all = (db) => {
   return new Promise((resolve, reject) => {
     db.all(allTeamsQ, (err, rows) => {
@@ -29,9 +45,19 @@ const all = (db) => {
 
 
 const find = (db, lookupBy) => {
-  const { query, arg } = lookupBy.id !== undefined
-    ? { query: findTeamByIdQ, arg: lookupBy.id }
-    : { query: findTeamByNameQ, arg: lookupBy.name }
+  let query = ''
+  let arg = ''
+
+  if (lookupBy.id !== undefined) {
+    query = findTeamByIdQ
+    arg = lookupBy.id
+  } else if (lookupBy.name !== undefined) {
+    query = findTeamByNameQ
+    arg = lookupBy.name
+  } else {
+    query = findTeamByTokenQ
+    arg = lookupBy.token
+  }
 
   return new Promise((resolve, reject) => {
     db.get(query, arg, (err, row) => {
@@ -44,6 +70,24 @@ const find = (db, lookupBy) => {
   })
 }
 
+const update = async (db, { id, score }) => {
+  return new Promise((reject, resolve) => {
+    db.run(updateScoreQ, score, id, err => err ? reject(err) : resolve())
+  })
+}
+
+const submitFlag = async (db, token, flag) => {
+  const submitted = flags.find(({ secret }) => secret === flag)
+
+  if (flag === undefined) {
+    return Promise.reject(new Error('incorrect flag'))
+  }
+  const { id, score } = await find(db, { token })
+  await submissions.create(db, id, submitted.id, submitted.value)
+  return await update(db, { id, score: score + submitted.value })
+}
+
 
 exports.all = all
 exports.find = find
+exports.submitFlag = submitFlag
