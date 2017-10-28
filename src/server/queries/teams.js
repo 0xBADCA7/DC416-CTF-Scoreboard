@@ -76,14 +76,18 @@ const update = async (db, { id, score }) => {
   })
 }
 
-const submitFlag = async (db, token, flag) => {
+const submitFlag = async (db, { token, flag }) => {
   const submitted = flags.find(({ secret }) => secret === flag)
 
   if (flag === undefined) {
     return Promise.reject(new Error('incorrect flag'))
   }
   const { id, score } = await find(db, { token })
-  await submissions.create(db, id, submitted.id, submitted.value)
+  await submissions.create(db, {
+    team: id,
+    flag: submitted.id,
+    value: submitted.value
+  })
   return await update(db, { id, score: score + submitted.value })
 }
 

@@ -1,5 +1,6 @@
 const teams = require('./teams')
 const messages = require('./messages')
+const submissions = require('./submissions')
 
 const createTeamTableQ = `
 create table if not exists teams (
@@ -13,7 +14,7 @@ create table if not exists teams (
 const createMessageTableQ = `
 create table if not exists messages (
   id integer primary key,
-  posted timestamp not null,
+  posted integer,
   content text not null
 );
 `
@@ -21,7 +22,7 @@ create table if not exists messages (
 const createSubmissionTableQ = `
 create table if not exists submissions (
   team_id integer,
-  time timestamp not null,
+  time integer,
   flag_id integer,
   value integer,
   foreign key (team_id) references teams (id)
@@ -39,3 +40,4 @@ const initDB = (db) => {
 exports.initDB = initDB
 exports.teams = teams
 exports.messages = messages
+exports.submissions = submissions

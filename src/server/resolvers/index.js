@@ -47,16 +47,21 @@ const resolvers = {
   },
   Mutation: {
     submitFlag: async (_, { submissionToken, flag }, { db }) => {
-      const result = await queries.teams.submitFlag(db, submissionToken, flag)
+      const result = await queries.teams.submitFlag(db, { flag, token: submissionToken })
       console.log('results from submitQuery', result)
       return []
     }
   },
   Team: {
-    lastSubmission: ({ name }, _, { db }) => {
-      return queries.teams.find(db, { name })
-        .then(team => team.lastSubmission || 'No submissions yet.')
+    lastSubmission: async ({ name }, _, { db }) => {
+      const submissions = await queries.submissions.find(db, { teamName: name })
+      submissions.sort((s1, s2) => s1.time - s2.time)
+      if (submissions.length === 0) {
+        return 'No submissions yet.'
       }
+      const date = new Date(submissions[submissions.length - 1].time)
+      return date.toLocaleString()
+    }
   }
 }
 
