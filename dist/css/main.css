@@ -41,9 +41,11 @@ tr#scoreboardHeader {
     font-size: 1.5em !important;
 }
 
+/*
 .card {
     height: inherit !important;
 }
+*/
 
 .mainContent {
     width: 50%;

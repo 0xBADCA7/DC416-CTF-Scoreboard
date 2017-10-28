@@ -47,7 +47,7 @@ const resolvers = {
       return {
         correct: true,
         newScore: 0,
-        scoreboard: [],
+        teams: [],
       }
     }
   },

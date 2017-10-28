@@ -21,6 +21,5 @@ type Message {
 
 type SubmitFlagResponse {
     correct: Boolean!
-    newScore: Int
-    scoreboard: [Team]!
+    teams: [Team]!
 }

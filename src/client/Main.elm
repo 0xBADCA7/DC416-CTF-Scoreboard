@@ -12,7 +12,7 @@ import Html.Events exposing (..)
 
 import Mode.Scoreboard as Scoreboard exposing (Scoreboard(..))
 import Mode.Message as Message exposing (Message)
-import Mode.SubmitForm as SubmitForm exposing (SubmitResponse)
+import Mode.SubmitForm as SubmitForm exposing (SubmitFlagResponse, SubmitResponse)
 
 
 -- MAIN
@@ -47,9 +47,10 @@ type ViewMode
 type Msg
     = SwitchMode ViewMode
     | ScoreboardRetrieved (Result Http.Error Scoreboard)
-    | FlagSubmitted (Result Http.Error SubmitResponse)
+    | FlagSubmitted (Result Http.Error SubmitFlagResponse)
     | MessagesRetrieved (Result Http.Error (List Message))
     | GotInput SubmitForm.Input
+    | DismissNotification
 
 
 type alias Model =
@@ -93,11 +94,7 @@ update msg model =
             ( { model | messages = messages }, Cmd.none )
 
         MessagesRetrieved (Err err) ->
-            let
-                _ =
-                    Debug.log "ERROR" err
-            in
-                ( model, Cmd.none )
+            ( model, Cmd.none )
 
         GotInput (SubmitForm.SubmissionToken input) ->
             ( { model | submitTokenInput = input }, Cmd.none )
@@ -108,18 +105,29 @@ update msg model =
         GotInput SubmitForm.Submit ->
             ( model, SubmitForm.mutation model.submitTokenInput model.flagInput FlagSubmitted )
 
-        FlagSubmitted (Err _) ->
+        DismissNotification ->
+            ( { model | notification = None }, Cmd.none )
+
+        FlagSubmitted (Err err) ->
             ( { model | notification = Error "Error submitting flag. Try again later." }, Cmd.none )
 
-        FlagSubmitted (Ok { correct, newScore, scoreboard }) ->
+        FlagSubmitted (Ok { submitFlag }) ->
             let
                 notification =
-                    if correct then
-                        Success ("Congratulations! Your team's score is now" ++ (toString newScore) ++ "!")
+                    if submitFlag.correct then
+                        Success "Congratulations! Your submission was accepted."
                     else
                         Error "Your submission was incorrect."
             in
-                ( { model | notification = notification, scoreboard = scoreboard }, Cmd.none )
+                ( { notification = notification
+                  , scoreboard = Scoreboard submitFlag.teams
+                  , submitTokenInput = ""
+                  , flagInput = ""
+                  , mode = ScoreboardView
+                  , messages = model.messages
+                  }
+                , Cmd.none
+                )
 
 
 
@@ -178,13 +186,16 @@ viewNav model =
 viewNotification : Model -> Html Msg
 viewNotification model =
     let
+        _ =
+            Debug.log "Model is " model
+
         ( kind, displayMode, message ) =
             case model.notification of
                 Error message ->
-                    ( "Error", "visible", message )
+                    ( "Error", "", message )
 
                 Success message ->
-                    ( "Success", "visible", message )
+                    ( "Success", "", message )
 
                 None ->
                     ( "", "none", "" )
@@ -194,10 +205,13 @@ viewNotification model =
             , class "mainContent"
             , style [ ( "display", displayMode ) ]
             ]
-            [ div [ class "card large waves-effect waves-light" ]
+            [ div [ class "card waves-effect waves-light" ]
                 [ div [ class "card-content" ]
                     [ span [ class "card-title gray-text text-darken-4" ] [ text kind ]
                     , p [] [ text message ]
+                    ]
+                , div [ class "card-action" ]
+                    [ a [ href "#", onClick DismissNotification ] [ text "Dismiss" ]
                     ]
                 ]
             ]
@@ -224,7 +238,7 @@ viewMode model =
                     ]
     in
         div [ class "mainContent" ]
-            [ div [ id "content", class "card large waves-effect waves-light" ]
+            [ div [ id "content", class "card waves-effect waves-light" ]
                 [ div [ class "card-content" ] viewContent
                 ]
             ]
