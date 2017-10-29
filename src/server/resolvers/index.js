@@ -61,10 +61,9 @@ const resolvers = {
       const submissions = await queries.submissions.find(db, { teamName: name })
       submissions.sort((s1, s2) => s1.time - s2.time)
       if (submissions.length === 0) {
-        return 'No submissions yet.'
+        return null
       }
-      const date = new Date(submissions[submissions.length - 1].time)
-      return date.toLocaleString()
+      return Math.round(submissions[submissions.length - 1].time / 1000.0)
     }
   }
 }

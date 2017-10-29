@@ -2,8 +2,6 @@ module Mode.Message exposing (Message, view, query)
 
 -- Core packages
 
-import Time
-import Date
 import Http
 import Html exposing (..)
 import Html.Attributes exposing (id, style, class)
@@ -13,6 +11,11 @@ import Json.Decode as Decode exposing (Decoder, field, string, list, int)
 -- Third-party packages
 
 import GraphQl exposing (Operation, Query, Named)
+
+
+-- Local packages
+
+import Util
 
 
 -- MODEL
@@ -46,29 +49,8 @@ view messages =
 viewMessage : Message -> Html msg
 viewMessage { posted, content } =
     let
-        postedDate =
-            posted
-                |> toFloat
-                |> (\x -> x * Time.second)
-                |> Date.fromTime
-
-        dateStr =
-            (toString <| Date.month postedDate) ++ " " ++ (toString <| Date.day postedDate)
-
-        hourStr =
-            postedDate
-                |> Date.hour
-                |> toString
-                |> String.padLeft 2 '0'
-
-        minuteStr =
-            postedDate
-                |> Date.minute
-                |> toString
-                |> String.padLeft 2 '0'
-
         postedStr =
-            "Posted on " ++ dateStr ++ " at " ++ hourStr ++ ":" ++ minuteStr
+            "Posted on " ++ (Util.prettyDate posted)
     in
         li [ class "adminMessage" ]
             [ span [ class "gray-text text-darken-4" ] [ text postedStr ]

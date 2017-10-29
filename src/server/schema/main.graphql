@@ -11,7 +11,7 @@ type Team {
     rank: Int
     name: String
     score: Int
-    lastSubmission: String
+    lastSubmission: Int
 }
 
 type Message {

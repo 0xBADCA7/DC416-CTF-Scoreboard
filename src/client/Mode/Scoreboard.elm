@@ -5,12 +5,17 @@ module Mode.Scoreboard exposing (Scoreboard(..), Team, view, query, scoreboard, 
 import Http
 import Html exposing (..)
 import Html.Attributes exposing (id)
-import Json.Decode as Decode exposing (Decoder, field, int, string, list)
+import Json.Decode as Decode exposing (Decoder, maybe, field, int, string, list)
 
 
 -- Third-party packages
 
 import GraphQl exposing (Operation, Query, Named)
+
+
+-- Local packages
+
+import Util
 
 
 -- MODEL
@@ -24,7 +29,7 @@ type alias Team =
     { rank : Int
     , name : String
     , score : Int
-    , lastSubmission : String
+    , lastSubmission : Maybe Int
     }
 
 
@@ -48,12 +53,21 @@ view (Scoreboard teams) =
 
 viewTeam : Team -> Html msg
 viewTeam team =
-    tr []
-        [ td [] [ text (toString team.rank) ]
-        , td [] [ text team.name ]
-        , td [] [ text (toString team.score) ]
-        , td [] [ text team.lastSubmission ]
-        ]
+    let
+        submissionStr =
+            case team.lastSubmission of
+                Just time ->
+                    Util.prettyDate time
+
+                Nothing ->
+                    "No submissions yet."
+    in
+        tr []
+            [ td [] [ text (toString team.rank) ]
+            , td [] [ text team.name ]
+            , td [] [ text (toString team.score) ]
+            , td [] [ text submissionStr ]
+            ]
 
 
 
@@ -66,7 +80,7 @@ team =
         (field "rank" int)
         (field "name" string)
         (field "score" int)
-        (field "lastSubmission" string)
+        (maybe (field "lastSubmission" int))
 
 
 scoreboard : Decoder Scoreboard
