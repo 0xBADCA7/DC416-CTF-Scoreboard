@@ -39,6 +39,7 @@ tr#scoreboardHeader {
 
 #logo {
     height: 64px !important;
+    cursor: pointer;
 }
 
 .brand-logo {
