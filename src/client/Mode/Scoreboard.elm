@@ -26,11 +26,35 @@ type Scoreboard
 
 
 type alias Team =
-    { rank : Int
-    , name : String
+    { name : String
     , score : Int
     , lastSubmission : Maybe Int
     }
+
+
+compareTeams : Team -> Team -> Order
+compareTeams team1 team2 =
+    let
+        maybeInt value =
+            case value of
+                Just n ->
+                    n
+
+                Nothing ->
+                    0
+
+        scoreOrder =
+            compare team2.score team1.score
+
+        submitOrder =
+            compare (maybeInt team1.lastSubmission) (maybeInt team2.lastSubmission)
+    in
+        case ( scoreOrder, submitOrder ) of
+            ( EQ, cmp ) ->
+                cmp
+
+            ( cmp, _ ) ->
+                cmp
 
 
 
@@ -39,20 +63,30 @@ type alias Team =
 
 view : Scoreboard -> Html msg
 view (Scoreboard teams) =
-    table [ id "scoreboard" ] <|
-        List.append
-            [ tr [ id "scoreboardHeader" ]
-                [ th [] [ text "Rank" ]
-                , th [] [ text "Name" ]
-                , th [] [ text "Score" ]
-                , th [] [ text "Last Submission" ]
+    let
+        sortedTeams =
+            List.sortWith compareTeams teams
+
+        ranks =
+            List.range 1 (List.length sortedTeams)
+
+        _ =
+            Debug.log "Sorted teams" sortedTeams
+    in
+        table [ id "scoreboard" ] <|
+            List.append
+                [ tr [ id "scoreboardHeader" ]
+                    [ th [] [ text "Rank" ]
+                    , th [] [ text "Name" ]
+                    , th [] [ text "Score" ]
+                    , th [] [ text "Last Submission" ]
+                    ]
                 ]
-            ]
-            (List.map viewTeam teams)
+                (List.map2 viewTeam ranks sortedTeams)
 
 
-viewTeam : Team -> Html msg
-viewTeam team =
+viewTeam : Int -> Team -> Html msg
+viewTeam rank team =
     let
         submissionStr =
             case team.lastSubmission of
@@ -63,7 +97,7 @@ viewTeam team =
                     "No submissions yet."
     in
         tr []
-            [ td [] [ text (toString team.rank) ]
+            [ td [] [ text (toString rank) ]
             , td [] [ text team.name ]
             , td [] [ text (toString team.score) ]
             , td [] [ text submissionStr ]
@@ -76,8 +110,7 @@ viewTeam team =
 
 team : Decoder Team
 team =
-    Decode.map4 Team
-        (field "rank" int)
+    Decode.map3 Team
         (field "name" string)
         (field "score" int)
         (maybe (field "lastSubmission" int))
@@ -93,8 +126,7 @@ scoreboardQuery =
     GraphQl.named "ScoreboardQuery"
         [ GraphQl.field "teams"
             |> GraphQl.withSelectors
-                [ GraphQl.field "rank"
-                , GraphQl.field "name"
+                [ GraphQl.field "name"
                 , GraphQl.field "score"
                 , GraphQl.field "lastSubmission"
                 ]

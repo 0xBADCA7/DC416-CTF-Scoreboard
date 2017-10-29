@@ -8,7 +8,6 @@ type Mutation {
 }
 
 type Team {
-    rank: Int
     name: String
     score: Int
     lastSubmission: Int

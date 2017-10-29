@@ -16,32 +16,9 @@ const testMessages = [
   },
 ]
 
-
-const teamSortCompare = (t1, t2) => {
-  if (t2.score != t1.score) {
-    return t2.score - t1.score
-  }
-  const time1 = new Date(t1.lastSubmission)
-  const time2 = new Date(t2.lastSubmission)
-  return time2.getTime() - time1.getTime()
-}
-
-
-const displayTeams = (teams) => {
-  teams.sort(teamSortCompare)
-  for (const index in teams) {
-    const i = parseInt(index)
-    teams[i].rank = i + 1
-  }
-  return teams
-}
-
 const resolvers = {
   Query: {
-    teams: async (_, __, { db }) => {
-      const teams = await queries.teams.all(db)
-      return displayTeams(teams)
-    },
+    teams: (_, __, { db }) => queries.teams.all(db),
     messages: async (_, __, { db }) => {
       const messages = await queries.messages.all(db)
       return messages.map(msg => {
@@ -55,8 +32,8 @@ const resolvers = {
       const result = await queries.teams.submitFlag(db, { flag, token: submissionToken })
       const teams = await queries.teams.all(db)
       return {
+        teams,
         correct: result,
-        teams: displayTeams(teams),
       }
     }
   },

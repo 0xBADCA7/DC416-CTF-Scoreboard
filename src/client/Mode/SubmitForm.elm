@@ -101,8 +101,7 @@ submitMutation token flag =
                 [ GraphQl.field "correct"
                 , GraphQl.field "teams"
                     |> GraphQl.withSelectors
-                        [ GraphQl.field "rank"
-                        , GraphQl.field "name"
+                        [ GraphQl.field "name"
                         , GraphQl.field "score"
                         , GraphQl.field "lastSubmission"
                         ]
