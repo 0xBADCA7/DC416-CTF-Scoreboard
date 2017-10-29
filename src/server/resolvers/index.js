@@ -18,12 +18,12 @@ const testMessages = [
 
 
 const teamSortCompare = (t1, t2) => {
-  if (t1.score != t2.score) {
-    return t1.score - t2.score
+  if (t2.score != t1.score) {
+    return t2.score - t1.score
   }
   const time1 = new Date(t1.lastSubmission)
   const time2 = new Date(t2.lastSubmission)
-  return time1.getTime() - time2.getTime()
+  return time2.getTime() - time1.getTime()
 }
 
 
@@ -33,7 +33,8 @@ const resolvers = {
       const teams = await queries.teams.all(db)
       teams.sort(teamSortCompare)
       for (const index in teams) {
-        teams[index].rank = index + 1
+        const i = parseInt(index)
+        teams[i].rank = i + 1
       }
       return teams
     },
