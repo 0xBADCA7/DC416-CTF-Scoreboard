@@ -38,8 +38,12 @@ const resolvers = {
       }
       return teams
     },
-    messages: (_, __, { db }) => {
-      return queries.messages.all(db)
+    messages: async (_, __, { db }) => {
+      const messages = await queries.messages.all(db)
+      return messages.map(msg => {
+        msg.posted = Math.round(msg.posted / 1000.0)
+        return msg
+      })
     }
   },
   Mutation: {

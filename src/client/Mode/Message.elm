@@ -2,10 +2,12 @@ module Mode.Message exposing (Message, view, query)
 
 -- Core packages
 
+import Time
+import Date
 import Http
 import Html exposing (..)
 import Html.Attributes exposing (id, style, class)
-import Json.Decode as Decode exposing (Decoder, field, string, list)
+import Json.Decode as Decode exposing (Decoder, field, string, list, int)
 
 
 -- Third-party packages
@@ -17,7 +19,7 @@ import GraphQl exposing (Operation, Query, Named)
 
 
 type alias Message =
-    { posted : String
+    { posted : Int
     , content : String
     }
 
@@ -28,15 +30,50 @@ type alias Message =
 
 view : List Message -> Html msg
 view messages =
-    ul [ id "messageList", style [ ( "list-style", "none" ) ] ] <| List.map viewMessage <| List.reverse messages
+    let
+        msgs =
+            messages
+                |> List.reverse
+                |> List.map viewMessage
+    in
+        ul
+            [ id "messageList"
+            , style [ ( "list-style", "none" ) ]
+            ]
+            msgs
 
 
 viewMessage : Message -> Html msg
 viewMessage { posted, content } =
-    li [ class "adminMessage" ]
-        [ span [ class "gray-text text-darken-4" ] [ text ("Posted " ++ posted) ]
-        , p [] [ text content ]
-        ]
+    let
+        postedDate =
+            posted
+                |> toFloat
+                |> (\x -> x * Time.second)
+                |> Date.fromTime
+
+        dateStr =
+            (toString <| Date.month postedDate) ++ " " ++ (toString <| Date.day postedDate)
+
+        hourStr =
+            postedDate
+                |> Date.hour
+                |> toString
+                |> String.padLeft 2 '0'
+
+        minuteStr =
+            postedDate
+                |> Date.minute
+                |> toString
+                |> String.padLeft 2 '0'
+
+        postedStr =
+            "Posted on " ++ dateStr ++ " at " ++ hourStr ++ ":" ++ minuteStr
+    in
+        li [ class "adminMessage" ]
+            [ span [ class "gray-text text-darken-4" ] [ text postedStr ]
+            , p [] [ text content ]
+            ]
 
 
 
@@ -46,7 +83,7 @@ viewMessage { posted, content } =
 message : Decoder Message
 message =
     Decode.map2 Message
-        (field "posted" string)
+        (field "posted" int)
         (field "content" string)
 
 

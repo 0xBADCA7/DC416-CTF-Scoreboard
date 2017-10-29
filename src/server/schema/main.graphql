@@ -15,7 +15,7 @@ type Team {
 }
 
 type Message {
-    posted: String
+    posted: Int
     content: String
 }
 
