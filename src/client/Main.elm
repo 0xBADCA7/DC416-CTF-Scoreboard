@@ -65,7 +65,7 @@ type alias Model =
 
 init : ( Model, Cmd Msg )
 init =
-    ( Model (Scoreboard []) "" "" [] ScoreboardView (Success "testing this out"), Scoreboard.query ScoreboardRetrieved )
+    ( Model (Scoreboard []) "" "" [] ScoreboardView None, Scoreboard.query ScoreboardRetrieved )
 
 
 
