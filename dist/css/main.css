@@ -37,15 +37,13 @@ tr#scoreboardHeader {
     border-bottom: 1px solid rgb(128, 128, 128);
 }
 
+#logo {
+    height: 64px !important;
+}
+
 .brand-logo {
     font-size: 1.5em !important;
 }
-
-/*
-.card {
-    height: inherit !important;
-}
-*/
 
 .mainContent {
     width: 50%;
