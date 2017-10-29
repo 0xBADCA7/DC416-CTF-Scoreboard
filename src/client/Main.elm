@@ -93,9 +93,6 @@ update msg model =
         MessagesRetrieved (Ok messages) ->
             ( { model | messages = messages }, Cmd.none )
 
-        MessagesRetrieved (Err err) ->
-            ( model, Cmd.none )
-
         GotInput (SubmitForm.SubmissionToken input) ->
             ( { model | submitTokenInput = input }, Cmd.none )
 
@@ -109,7 +106,9 @@ update msg model =
             ( { model | notification = None }, Cmd.none )
 
         FlagSubmitted (Err err) ->
-            ( { model | notification = Error "Error submitting flag. Try again later." }, Cmd.none )
+            ( { model | notification = Error "Your submission was not accepted." }
+            , Cmd.none
+            )
 
         FlagSubmitted (Ok { submitFlag }) ->
             let
@@ -117,7 +116,7 @@ update msg model =
                     if submitFlag.correct then
                         Success "Congratulations! Your submission was accepted."
                     else
-                        Error "Your submission was incorrect."
+                        Error "Your submission was not accepted."
             in
                 ( { notification = notification
                   , scoreboard = Scoreboard submitFlag.teams
@@ -128,6 +127,9 @@ update msg model =
                   }
                 , Cmd.none
                 )
+
+        _ ->
+            ( model, Cmd.none )
 
 
 
@@ -186,9 +188,6 @@ viewNav model =
 viewNotification : Model -> Html Msg
 viewNotification model =
     let
-        _ =
-            Debug.log "Model is " model
-
         ( kind, displayMode, message ) =
             case model.notification of
                 Error message ->
