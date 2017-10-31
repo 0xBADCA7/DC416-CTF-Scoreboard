@@ -1,0 +1,114 @@
+html, body {
+    background-color: #eee;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+nav {
+    margin-bottom: 35px;
+    background-color: #284490 !important;
+    /*background-color: #607D8B !important;*/
+}
+
+table {
+    width: 100% !important;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+th {
+    font-weight: 400;
+    color: rgb(161, 161, 161);
+}
+
+tr, th, td {
+    text-align: center !important;
+}
+
+td, th, p, a, label, input {
+    font-size: 1.2em !important;
+}
+
+label {
+    margin-bottom: 10px !important;
+}
+
+tr#scoreboardHeader {
+    border-bottom: 1px solid rgb(128, 128, 128);
+}
+
+#logo {
+    height: 64px !important;
+    cursor: pointer;
+}
+
+.brand-logo {
+    font-size: 1.5em !important;
+}
+
+.mainContent {
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.mainContent .card {
+    width: 100%;
+}
+
+a.btn {
+    width: 142px !important;
+    height: 42px !important;
+    text-align: center;
+    padding-top: 2px;
+}
+
+a.btnPrimary {
+    background-color: #4CAF50 !important;
+}
+
+a.btnSecondary {
+    background-color: #2196F3 !important;
+}
+
+ul#messageList li:last-child {
+    margin-bottom: 0px !important;
+    border: 0 !important;
+}
+
+ul#messageList li {
+    border-bottom: 1px solid rgb(128, 128, 128);
+    margin-bottom: 25px !important;
+}
+
+ul#messageList li span {
+    display: inline-block;
+    margin-bottom: 10px;
+}
+
+ul#messageList li p {
+    margin-bottom: 20px !important;
+}
+
+ul.buttonList.horizontal li {
+    margin-right: 4px;
+    display: inline;
+}
+
+::-webkit-input-placeholder { /* WebKit, Blink, Edge */
+    color: rgb(134, 134, 134) !important;  
+}
+:-moz-placeholder { /* Mozilla Firefox 4 to 18 */
+   color: rgb(134, 134, 134) !important;
+   opacity:  1;
+}
+::-moz-placeholder { /* Mozilla Firefox 19+ */
+   color: rgb(134, 134, 134) !important;
+   opacity:  1;
+}
+:-ms-input-placeholder { /* Internet Explorer 10-11 */
+   color: rgb(134, 134, 134) !important;      
+}
+::-ms-input-placeholder { /* Microsoft Edge */
+   color: rgb(134, 134, 134) !important;
+}

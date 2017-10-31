@@ -1,0 +1,12 @@
+[
+    {
+        "id": 1,
+        "secret": "flag1",
+        "value": 10
+    },
+    {
+        "id": 2,
+        "secret": "flag2",
+        "value": 25
+    }
+]

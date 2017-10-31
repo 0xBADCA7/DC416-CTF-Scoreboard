@@ -1,0 +1,24 @@
+type Query {
+    teams: [Team]
+    messages: [Message]
+}
+
+type Mutation {
+    submitFlag(submissionToken: String!, flag: String!): SubmitFlagResponse
+}
+
+type Team {
+    name: String
+    score: Int
+    lastSubmission: Int
+}
+
+type Message {
+    posted: Int
+    content: String
+}
+
+type SubmitFlagResponse {
+    correct: Boolean!
+    teams: [Team]!
+}

@@ -1,0 +1,34 @@
+{
+  "name": "dc416-ctf-scoreboard",
+  "version": "3.0.0",
+  "description": "",
+  "main": "src/server/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/server/index.js",
+    "build": "elm-make src/client/Main.elm --output dist/js/user.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DC416/DC416-CTF-Scoreboard.git"
+  },
+  "keywords": [
+    "ctf",
+    "scoreboard",
+    "capture-the-flag"
+  ],
+  "author": "Zack Mullaly <zsck@riseup.net>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/DC416/DC416-CTF-Scoreboard/issues"
+  },
+  "homepage": "https://github.com/DC416/DC416-CTF-Scoreboard#readme",
+  "dependencies": {
+    "express": "^4.16.2",
+    "express-graphql": "^0.6.11",
+    "graphql": "^0.11.7",
+    "graphql-tools": "^2.5.1",
+    "sqlite3": "^3.1.13",
+    "yargs": "^10.0.3"
+  }
+}
