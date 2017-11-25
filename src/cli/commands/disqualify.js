@@ -1,15 +1,22 @@
 const sql = require('sqlite3')
 
 
-const query = `delete from teams where name = $1;`
+const queryDeleteSubmissions = `delete from submissions where team_id = (select id from teams where name = $1 limit 1);`
+const queryDeleteTeam = `delete from teams where name = $1;`
 
 const run = argv => {
   const db = new sql.Database(argv.database)
-  db.run(query, argv.name, err => {
+  db.run(queryDeleteSubmissions, argv.name, err => {
     if (err) {
       console.log(`Error registering team: ${err.message}`)
     } else {
-      console.log(`Success! "${argv.name}" will no longer be listed on the scoreboard or allowed to submit flags.`)
+      db.run(queryDeleteTeam, argv.name, err => {
+        if (err) {
+          console.log(`Error registering team: ${err.message}`)
+        } else {
+          console.log(`${argv.name} has been deregistered successfully!`)
+        }
+      })
     }
   })
 }
