@@ -151,6 +151,7 @@ view model =
         [ viewNav model
         , viewNotification model
         , viewMode model
+        , viewSponsors model
         ]
 
 
@@ -241,3 +242,24 @@ viewMode model =
                 [ div [ class "card-content" ] viewContent
                 ]
             ]
+
+
+viewSponsors : Model -> Html Msg
+viewSponsors model =
+    div
+        [ id "sponsors"
+        , class "mainContent"
+        ]
+        [ div [ class "card waves-effect waves-light" ]
+            [ div [ class "card-content" ]
+                [ span [ class "card-title gray-text text-darken-4" ] [ text "Sponsors" ]
+                , div [ class "row" ]
+                    [ div [ class "col s12" ] [ img [ id "titleSponsor", src "/img/Symantec.png" ] [] ]
+                    ]
+                , div [ class "row" ]
+                    [ div [ class "col s6" ] [ img [ class "sponsor", src "/img/Cycura.jpg" ] [] ]
+                    , div [ class "col s6" ] [ img [ class "sponsor", src "img/Brainstation.png" ] [] ]
+                    ]
+                ]
+            ]
+        ]

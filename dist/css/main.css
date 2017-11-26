@@ -42,6 +42,10 @@ tr#scoreboardHeader {
     cursor: pointer;
 }
 
+#titleSponsor, .sponsor  {
+    width: 100%;
+}
+
 .brand-logo {
     font-size: 1.5em !important;
 }
