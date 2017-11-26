@@ -38,16 +38,13 @@ tr#scoreboardHeader {
 }
 
 #logo {
-    height: 64px !important;
+    max-height: 100%;
     cursor: pointer;
+    left: 0;
 }
 
 #titleSponsor, .sponsor  {
     width: 100%;
-}
-
-.brand-logo {
-    font-size: 1.5em !important;
 }
 
 .mainContent {
@@ -115,4 +112,27 @@ ul.buttonList.horizontal li {
 }
 ::-ms-input-placeholder { /* Microsoft Edge */
    color: rgb(134, 134, 134) !important;
+}
+
+
+@media screen and (max-width:1060px) {
+    * {
+        font-size: 10px;
+    }
+
+    .mainContent {
+        width: 90%;
+    }
+}
+
+@media screen and (max-width:992px) {
+    #logo {
+        left: 7%;
+    }
+}
+
+@media screen and (max-width:700px) {
+    #logo {
+        left: 10%;
+    }
 }
